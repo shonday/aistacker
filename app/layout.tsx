@@ -9,6 +9,9 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   title: "AIStacker | Free Developer & AI Tools Stack",
   description: "Fast, secure, and privacy-focused online developer tools. Format JSON, encode Base64, generate UUIDs, and more directly in your browser.",
+  alternates: {
+    canonical: "https://aistacker.dev",
+  }
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

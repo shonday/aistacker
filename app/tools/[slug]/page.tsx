@@ -4,34 +4,36 @@ import ToolLayout from "@/components/ToolLayout";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
-/**
- * 军师，这里是核心变化：
- * 明确定义 PageProps 类型，符合 Next.js 16 严格模式。
- */
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
 /**
- * 1. 官方推荐的 generateMetadata 姿势
- * 框架会自动处理这个 Promise
+ * 修复一：校准 Metadata 路径
  */
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const params = await props.params; // 这里是标准的 Promise 处理
+  const params = await props.params;
   const tool = tools.find((t) => t.slug === params.slug);
   
   if (!tool) return { title: "Tool Not Found" };
 
   return {
-    title: `${tool.seoTitle} | AIStacker`,
-    description: tool.seoDescription,
+    title: `${tool.seo.title} | AIStacker`,
+    description: tool.seo.description,
+    // 注入 Canonical 标签
+    alternates: {
+      canonical: `https://aistacker.dev/tools/${tool.slug}`,
+    },
+    // 额外增强：针对爬虫的开放图谱
+    openGraph: {
+      title: tool.seo.title,
+      description: tool.seo.description,
+      url: `https://aistacker.dev/tools/${tool.slug}`,
+      type: 'website',
+    }
   };
 }
 
-/**
- * 2. 保持 generateStaticParams 
- * 这是 SEO 静态化的压舱石，也是框架理解 [slug] 范围的依据
- */
 export async function generateStaticParams() {
   return tools.map((tool) => ({
     slug: tool.slug,
@@ -39,8 +41,7 @@ export async function generateStaticParams() {
 }
 
 /**
- * 3. 终极渲染组件
- * 使用 props 直接接收，并保持异步一致性
+ * 修复二：确保数据完整传递给 Layout
  */
 export default async function ToolPage(props: PageProps) {
   const params = await props.params;
@@ -48,10 +49,9 @@ export default async function ToolPage(props: PageProps) {
 
   if (!tool) return notFound();
 
-  // 这里的 Component 获取保持不变，依然通过 Registry
   const Component = toolRegistry[tool.component];
 
-  // 内链系统（随机化算法保持不变，确保每次渲染的 SEO 活力）
+  // 内链系统
   const relatedTools = tools
     .filter((t) => t.slug !== params.slug)
     .sort(() => 0.5 - Math.random())
@@ -63,17 +63,26 @@ export default async function ToolPage(props: PageProps) {
 
   return (
     <>
+      {/* 结构化数据补全 */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": tool.name,
+            "applicationCategory": "DeveloperApplication",
+            "description": tool.description,
+            "operatingSystem": "Any",
+          }),
+        }}
+      />
       <ToolLayout
         h1={tool.name}
         description={tool.description}
         tool={<Component />}
-        content={
-          <div className="prose prose-slate max-w-none">
-            <h2>Utilizing the {tool.name} for Maximum Efficiency</h2>
-            <p>Our {tool.name} is designed to provide seamless, browser-side processing for high-performance needs.</p>
-            {/* 这里的 Content 未来将通过 data/tools.ts 里的 markdown 字段动态注入 */}
-          </div>
-        }
+        // 确保传递的是 tool.content 对象
+        content={tool.content}
         relatedTools={relatedTools}
       />
     </>
