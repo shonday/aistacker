@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://aistacker.dev
+
+# Sitemaps
+Sitemap: https://aistacker.dev/sitemap.xml
