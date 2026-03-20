@@ -3,8 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://aistacker.isekai.workers.dev
+Host: https://aistacker.dev
 
 # Sitemaps
-Sitemap: https://aistacker.isekai.workers.dev/sitemap.xml
 Sitemap: https://aistacker.dev/sitemap.xml

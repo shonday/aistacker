@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>generate-tool — Complete Guide</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c25;
+    --surface2: #1e2330;
+    --border: #2a2f3f;
+    --border2: #353b4e;
+    --text: #e2e6f0;
+    --muted: #8b92a8;
+    --accent: #5b8af0;
+    --accent2: #7c6af5;
+    --green: #3ecf8e;
+    --amber: #f5a623;
+    --red: #e05c5c;
+    --cyan: #3ec9d6;
+    --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── Layout ── */
+  .shell {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    padding: 28px 0 40px;
+    background: var(--surface);
+    scrollbar-width: none;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .logo-text { font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .logo-sub  { font-size: 11px; color: var(--muted); }
+
+  .nav-section {
+    padding: 4px 12px 0;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 16px;
+    margin-bottom: 4px;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 20px;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 0;
+    transition: color .15s, background .15s;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+  .nav-link:hover { color: var(--text); background: var(--surface2); }
+  .nav-link.active { color: var(--accent); background: rgba(91,138,240,.1); border-right: 2px solid var(--accent); }
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+  /* ── Main ── */
+  .main {
+    padding: 48px 56px;
+    max-width: 860px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── Typography ── */
+  h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+  h2 { font-size: 20px; font-weight: 600; margin: 36px 0 14px; color: var(--text); }
+  h3 { font-size: 15px; font-weight: 600; margin: 24px 0 10px; color: var(--text); }
+  p  { color: var(--muted); margin-bottom: 14px; }
+  .lead { font-size: 16px; color: var(--text); opacity: .75; margin-bottom: 28px; }
+
+  /* ── Code blocks ── */
+  pre {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 14px 0 20px;
+    position: relative;
+  }
+  pre .c  { color: var(--muted); }         /* comment */
+  pre .k  { color: var(--accent2); }       /* keyword / flag */
+  pre .s  { color: var(--green); }         /* string */
+  pre .v  { color: var(--cyan); }          /* value */
+  pre .cmd { color: var(--accent); }       /* command */
+  pre .h  { color: var(--amber); }         /* highlight */
+
+  code {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--cyan);
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 10px; right: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: color .15s, border-color .15s;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--border2); }
+  .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    display: flex;
+    gap: 12px;
+    font-size: 14px;
+  }
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout.tip    { background: rgba(62,207,142,.07); border: 1px solid rgba(62,207,142,.2); }
+  .callout.warn   { background: rgba(245,166,35,.07);  border: 1px solid rgba(245,166,35,.2); }
+  .callout.info   { background: rgba(91,138,240,.07);  border: 1px solid rgba(91,138,240,.2); }
+  .callout.tip  p, .callout.warn p, .callout.info p { color: var(--text); opacity: .85; margin: 0; }
+
+  /* ── Param table ── */
+  .param-table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 13.5px; }
+  .param-table th {
+    text-align: left;
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .param-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .param-table tr:last-child td { border-bottom: none; }
+  .param-table td:first-child { font-family: var(--mono); font-size: 12.5px; color: var(--accent); white-space: nowrap; }
+  .param-table td:nth-child(2) { color: var(--cyan); font-family: var(--mono); font-size: 12px; }
+  .param-table td:nth-child(3) { color: var(--muted); }
+  .param-table tr:hover td { background: var(--surface2); }
+  .req { color: var(--red) !important; font-size: 10px; font-weight: 700; letter-spacing: .05em; }
+  .opt { color: var(--muted) !important; font-size: 10px; }
+
+  /* ── Check items ── */
+  .checklist { list-style: none; padding: 0; margin: 12px 0 20px; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check-icon { flex-shrink: 0; margin-top: 2px; }
+  .check-icon.pass { color: var(--green); }
+  .check-icon.warn-c { color: var(--amber); }
+  .check-icon.err  { color: var(--red); }
+
+  /* ── Flow diagram ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 20px 0;
+  }
+  .flow-step {
+    display: flex;
+    gap: 16px;
+    padding: 0 0 0 4px;
+  }
+  .flow-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .flow-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .flow-connector {
+    width: 2px;
+    flex: 1;
+    background: var(--border2);
+    min-height: 20px;
+  }
+  .flow-content {
+    padding-bottom: 22px;
+    flex: 1;
+  }
+  .flow-title { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 3px; }
+  .flow-desc  { font-size: 13px; color: var(--muted); }
+
+  /* ── Badge row ── */
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid;
+  }
+  .badge.green { background: rgba(62,207,142,.1); border-color: rgba(62,207,142,.3); color: var(--green); }
+  .badge.blue  { background: rgba(91,138,240,.1);  border-color: rgba(91,138,240,.3);  color: var(--accent); }
+  .badge.amber { background: rgba(245,166,35,.1);  border-color: rgba(245,166,35,.3);  color: var(--amber); }
+  .badge.purple{ background: rgba(124,106,245,.1); border-color: rgba(124,106,245,.3); color: var(--accent2); }
+
+  /* ── Prompt builder widget ── */
+  .builder {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+  }
+  .builder label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--muted);
+    margin-bottom: 6px;
+    margin-top: 16px;
+  }
+  .builder label:first-child { margin-top: 0; }
+  .builder input, .builder textarea, .builder select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-size: 13.5px;
+    font-family: var(--sans);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .builder input:focus, .builder textarea:focus, .builder select:focus {
+    border-color: var(--accent);
+  }
+  .builder textarea { resize: vertical; min-height: 80px; }
+  .builder select option { background: var(--surface); }
+  .builder-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: opacity .15s;
+  }
+  .btn-primary:hover { opacity: .88; }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--muted);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: color .15s, border-color .15s;
+  }
+  .btn-secondary:hover { color: var(--text); border-color: var(--accent); }
+  #cmd-output {
+    margin-top: 18px;
+    display: none;
+  }
+  #cmd-output.visible { display: block; }
+
+  /* ── Features input ── */
+  .feature-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+  .feature-row { display: flex; gap: 6px; align-items: center; }
+  .feature-row input { flex: 1; }
+  .feature-row button {
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    border-radius: 6px;
+    width: 28px; height: 28px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: color .15s, border-color .15s;
+  }
+  .feature-row button:hover { color: var(--red); border-color: var(--red); }
+  .add-feature {
+    background: none;
+    border: 1px dashed var(--border2);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 7px;
+    width: 100%;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: var(--sans);
+    transition: color .15s, border-color .15s;
+    margin-top: 4px;
+  }
+  .add-feature:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── Page header ── */
+  .page-header {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .breadcrumb span { color: var(--accent); }
+
+  /* ── Scrollbar ── */
+  .main::-webkit-scrollbar { width: 5px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ── Sidebar ─────────────────────────────────────────────────────── -->
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div class="logo-text">generate-tool</div>
+      <div class="logo-sub">AIStacker Guide</div>
+    </div>
+  </div>
+
+  <div class="nav-section">Getting Started</div>
+  <button class="nav-link active" onclick="show('overview')"><span class="nav-dot"></span>Overview</button>
+  <button class="nav-link" onclick="show('quickstart')"><span class="nav-dot"></span>Quick Start</button>
+
+  <div class="nav-section">CLI Reference</div>
+  <button class="nav-link" onclick="show('params')"><span class="nav-dot"></span>All Parameters</button>
+  <button class="nav-link" onclick="show('single')"><span class="nav-dot"></span>Single Tool</button>
+  <button class="nav-link" onclick="show('batch')"><span class="nav-dot"></span>Batch Mode</button>
+
+  <div class="nav-section">Quality</div>
+  <button class="nav-link" onclick="show('testing')"><span class="nav-dot"></span>Testing a Tool</button>
+  <button class="nav-link" onclick="show('upgrade')"><span class="nav-dot"></span>Upgrading a Tool</button>
+  <button class="nav-link" onclick="show('checker')"><span class="nav-dot"></span>Static Checker</button>
+
+  <div class="nav-section">Prompt Strategy</div>
+  <button class="nav-link" onclick="show('prompts')"><span class="nav-dot"></span>Writing Good Prompts</button>
+  <button class="nav-link" onclick="show('meta-prompt')"><span class="nav-dot"></span>LLM → Prompt</button>
+  <button class="nav-link" onclick="show('builder')"><span class="nav-dot"></span>Command Builder</button>
+</nav>
+
+<!-- ── Main content ─────────────────────────────────────────────────── -->
+<div class="main">
+
+<!-- OVERVIEW -->
+<section id="overview" class="section active">
+  <div class="page-header">
+    <div class="breadcrumb">AIStacker / <span>Overview</span></div>
+    <h1>generate-tool</h1>
+    <p class="lead">A CLI that turns a feature list into a production-ready React tool component, complete with SEO copy, registry entries, and a manual review checklist.</p>
+  </div>
+
+  <h2>How it works</h2>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">1 · Load environment</div>
+        <div class="flow-desc">Reads <code>.env.local</code>, populates LLM API keys into <code>process.env</code>.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">2 · Conflict check</div>
+        <div class="flow-desc">Scans <code>data/tools.ts</code> to confirm the slug is not already registered. Fails immediately if it is.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">3 · Build prompt → call LLM</div>
+        <div class="flow-desc">Constructs a structured prompt with every feature, WRONG/RIGHT examples, and output format. Tries Ollama → Gemini → Anthropic → Groq in order.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">4 · Parse output</div>
+        <div class="flow-desc">Extracts <code>=== SECTION ===</code> blocks: component TSX, category, tags, SEO title, SEO description, intro, usage, example, use cases, FAQ.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot" style="background:var(--amber)"></div><div class="flow-connector"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">5 · Static check</div>
+        <div class="flow-desc">Validates component name, semantic Tailwind tokens, shadcn imports, no <code>alert()</code>, accessibility labels. Errors trigger a retry with a fix prompt.</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot" style="background:var(--green)"></div></div>
+      <div class="flow-content">
+        <div class="flow-title">6 · Write output</div>
+        <div class="flow-desc">Saves <code>ComponentName.tsx</code>, <code>REVIEW.md</code>, and optionally copies the component into the project and appends registry entries automatically.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">ℹ</span>
+    <p>All three retry attempts use the same LLM provider that succeeded in attempt 1. The fix prompt sends back the previous code plus the exact error list from the static checker.</p>
+  </div>
+</section>
+
+<!-- QUICKSTART -->
+<section id="quickstart" class="section">
+  <div class="page-header">
+    <div class="breadcrumb">AIStacker / <span>Quick Start</span></div>
+    <h1>Get running in 3 steps</h1>
+    <p class="lead">From zero to your first generated tool.</p>
+  </div>
+
+  <h2>Step 1 — Set up your API key</h2>
+  <p>Pick one provider. Gemini Flash is recommended: free tier is generous and fast.</p>
+  <pre><span class="c"># in .env.local</span>
+<span class="k">GEMINI_API_KEY</span>=<span class="s">your-key-here</span>
+<span class="c"># get it at: aistudio.google.com/apikey</span></pre>
+
+  <h2>Step 2 — Run your first tool</h2>
+  <pre><span class="cmd">npx tsx</span> scripts/generate-tool.ts \
+  <span class="k">--id</span>       <span class="s">"jwt-decoder"</span> \
+  <span class="k">--name</span>     <span class="s">"JWT Decoder"</span> \
+  <span class="k">--desc</span>     <span class="s">"Decode and inspect JWT tokens — header, payload, expiry — in your browser."</span> \
+  <span class="k">--features</span> <span class="s">"decode header as JSON,decode payload as JSON,show expiry status,copy individual sections"</span></pre>
+
+  <p>Output after ~20 seconds:</p>
+  <pre><span class="h">✅  Generated in 18.4s via gemini</span>
+    Component : ./output/JwtDecoder.tsx
+    Review    : ./output/REVIEW.md</pre>
+
+  <h2>Step 3 — Review and deploy</h2>
+  <pre><span class="c"># Open the checklist</span>
+<span class="cmd">cat</span> output/REVIEW.md
+
+<span class="c"># Start dev server and verify</span>
+<span class="cmd">npm run dev</span>
+<span class="c"># → open http://localhost:3000/tools/jwt-decoder</span>
+
+<span class="c"># If it looks good, copy to project manually OR re-run with --project-dir</span>
+<span class="cmd">npx tsx</span> scripts/generate-tool.ts <span class="k">--id</span> <span class="s">"jwt-decoder"</span> ... <span class="k">--project-dir</span> <span class="s">.</span></pre>
+
+  <div class="callout tip">
+    <span class="callout-icon">✓</span>
+    <p><strong>Tip:</strong> Always run without <code>--project-dir</code> first. Review the output, then re-run with <code>--project-dir .</code> to auto-copy and auto-register. This gives you a chance to check before it touches your registry files.</p>
+  </div>
+</section>
+
+<!-- PARAMS -->
+<section id="params" class="section">
+  <div class="page-header">
+    <div class="breadcrumb">AIStacker / <span>All Parameters</span></div>
+    <h1>CLI Parameters</h1>
+    <p class="lead">Complete reference for all <code>generate-tool.ts</code> flags.</p>
+  </div>
+
+  <table class="param-table">
+    <thead>
+      <tr><th>Flag</th><th>Type</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>--id</td>
+        <td><span class="req">REQUIRED</span></td>
+        <td>Kebab-case slug. Becomes the URL (<code>/tools/jwt-decoder</code>), the filename (<code>JwtDecoder.tsx</code>), and the registry key. Must be unique.</td>
+      </tr>
+      <tr>
+        <td>--name</td>
+        <td><span class="req">REQUIRED</span></td>
+        <td>Human-readable display name shown in the UI and page title. Example: <code>"JWT Decoder"</code></td>
+      </tr>
+      <tr>
+        <td>--desc</td>
+        <td><span class="req">REQUIRED</span></td>
+        <td>One-sentence description used in cards and meta tags. Keep it under 160 chars. Be specific — this directly affects SEO.</td>
+      </tr>
+      <tr>
+        <td>--features</td>
+        <td><span class="req">REQUIRED</span></td>
+        <td>Comma-separated list of features the LLM <strong>must</strong> implement. The more specific, the better. Each feature becomes a checkbox in REVIEW.md.</td>
+      </tr>
+      <tr>
+        <td>--category</td>
+        <td><span class="opt">optional</span></td>
+        <td>One of: <code>formatter encoder generator tester converter japanese text number color image network crypto</code>. Auto-detected by the LLM if omitted.</td>
+      </tr>
+      <tr>
+        <td>--tags</td>
+        <td><span class="opt">optional</span></td>
+        <td>Comma-separated tags for search and cross-linking. Auto-generated by LLM if omitted. Example: <code>"jwt,token,decoder,base64,auth"</code></td>
+      </tr>
+      <tr>
+        <td>--provider</td>
+        <td><span class="opt">optional</span></td>
+        <td><code>auto</code> (default) | <code>ollama</code> | <code>gemini</code> | <code>anthropic</code> | <code>groq</code>. <code>auto</code> tries providers in priority order until one succeeds.</td>
+      </tr>
+      <tr>
+        <td>--attempts</td>
+        <td><span class="opt">optional</span></td>
+        <td>Max retry attempts when static checks fail. Default: <code>3</code>. Each retry sends the errors back to the LLM with a fix prompt.</td>
+      </tr>
+      <tr>
+        <td>--output</td>
+        <td><span class="opt">optional</span></td>
+        <td>Directory for generated files. Default: <code>./output</code>. Safe to run multiple times — files are overwritten.</td>
+      </tr>
+      <tr>
+        <td>--project-dir</td>
+        <td><span class="opt">optional</span></td>
+        <td>If set, automatically copies the component to <code>{project-dir}/components/tools/</code> and appends entries to <code>data/tools.ts</code> and <code>lib/toolRegistry.ts</code>.</td>
+      </tr>
+      <tr>
+        <td>--batch</td>
+        <td><span class="opt">optional</span></td>
+        <td>Path to a JSON file containing an array of request objects. All other flags are ignored when <code>--batch</code> is set.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- SINGLE -->
+<section id="single" class="section">
+  <div class="page-header">
+    <div class="breadcrumb">AIStacker / <span>Single Tool</span></div>
+    <h1>Single Tool Generation</h1>
+    <p class="lead">Generating and deploying one tool at a time.</p>
+  </div>
+
+  <h2>Generate only (safe, no project changes)</h2>
+  <pre><span class="cmd">npx tsx</span> scripts/generate-tool.ts \
+  <span class="k">--id</span>       <span class="s">"color-converter"</span> \
+  <span class="k">--name</span>     <span class="s">"Color Converter"</span> \
+  <span class="k">--desc</span>     <span class="s">"Convert colors between HEX, RGB, HSL, and HSB with a live preview."</span> \
+  <span class="k">--features</span> <span class="s">"hex input,rgb input,hsl output,hsb output,live color swatch,copy any format"</span> \
+  <span class="k">--category</span> <span class="s">"color"</span></pre>
+
+  <h2>Generate and auto-deploy to project</h2>
+  <pre><span class="cmd">npx tsx</span> scripts/generate-tool.ts \
+  <span class="k">--id</span>       <span class="s">"color-converter"</span> \
+  <span class="k">--name</span>     <span class="s">"Color Converter"</span> \
+  <span class="k">--desc</span>     <span class="s">"Convert colors between HEX, RGB, HSL, and HSB with a live preview."</span> \
+  <span class="k">--features</span> <span class="s">"hex input,rgb input,hsl output,hsb output,live color swatch,copy any format"</span> \
+  <span class="k">--project-dir</span> <span class="s">.</span>
+<span class="c">
+# What --project-dir does automatically:
+#   1. Copies ColorConverter.tsx → components/tools/ColorConverter.tsx
+#   2. Appends entry  → data/tools.ts
+#   3. Appends line   → lib/toolRegistry.ts</span></pre>
+
+  <h2>Force a specific provider</h2>
+  <pre><span class="c"># Use Anthropic instead of auto-fallback</span>
+<span class="cmd">npx tsx</span> scripts/generate-tool.ts \
+  <span class="k">--id</span> <span class="s">"color-converter"</span> ... \
+  <span class="k">--provider</span> <span class="s">anthropic</span>
+
+<span class="c"># Use local Ollama (offline, private)</span>
+<span class="cmd">npx tsx</span> scripts/generate-tool.ts \
+  <span class="k">--id</span> <span class="s">"color-converter"</span> ... \
+  <span class="k">--provider</span> <span class="s">ollama</span></pre>
+
+  <h2>Increase retries for complex tools</h2>
+  <pre><span class="c"># Allow up to 5 retry attempts (useful for tools with many features)</span>
+<span class="cmd">npx tsx</span> scripts/generate-tool.ts \
+  <span class="k">--id</span> <span class="s">"markdown-preview"</span> ... \
+  <span class="k">--attempts</span> <span class="v">5</span></pre>
+</section>
+
+<!-- BATCH -->
+<section id="batch" class="section">
+  <div class="page-header">
+    <div class="breadcrumb">AIStacker / <span>Batch Mode</span></div>
+    <h1>Batch Generation</h1>
+    <p class="lead">Generate multiple tools from a JSON manifest. Tools are processed sequentially with a 2-second pause between each to respect rate limits.</p>
+  </div>
+
+  <h2>Batch JSON format</h2>
+  <p>Create a file at <code>scripts/codegen/batch/wave1.json</code>:</p>
+  <pre>[
+  {
+    <span class="k">"toolId"</span>:      <span class="s">"jwt-decoder"</span>,
+    <span class="k">"displayName"</span>: <span class="s">"JWT Decoder"</span>,
+    <span class="k">"description"</span>: <span class="s">"Decode and inspect JWT tokens instantly."</span>,
+    <span class="k">"features"</span>: [
+      <span class="s">"decode header as JSON"</span>,
+      <span class="s">"decode payload as JSON"</span>,
+      <span class="s">"show expiry status"</span>,
+      <span class="s">"copy individual sections"</span>
+    ]
+  },
+  {
+    <span class="k">"toolId"</span>:      <span class="s">"color-converter"</span>,
+    <span class="k">"displayName"</span>: <span class="s">"Color Converter"</span>,
+    <span class="k">"description"</span>: <span class="s">"Convert between HEX, RGB, HSL, and HSB."</span>,
+    <span class="k">"features"</span>: [
+      <span class="s">"hex input"</span>, <span class="s">"rgb input"</span>, <span class="s">"hsl output"</span>, <span class="s">"live color swatch"</span>
+    ],
+    <span class="k">"category"</span>: <span class="s">"color"</span>
+  }
+]</pre>
+
+  <h2>Run the batch</h2>
+  <pre><span class="cmd">npx tsx</span> scripts/generate-tool.ts <span class="k">--batch</span> scripts/codegen/batch/wave1.json
+
+<span class="c"># With auto-deploy to project</span>
+<span class="cmd">npx tsx</span> scripts/generate-tool.ts \
+  <span class="k">--batch</span>       scripts/codegen/batch/wave1.json \
+  <span class="k">--project-dir</span> <span class="s">.</span></pre>
+
+  <p>Output summary at the end:</p>
+  <pre><span class="h">[batch] Done — 5 succeeded, 1 failed.</span></pre>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠</span>
+    <p><strong>Batch + --project-dir:</strong> Registry files are appended after each successful tool. If a later tool fails, the earlier ones are already in the registry. Check git diff before committing.</p>
+  </div>
+
+  <h2>Pre-configured wave 1</h2>
+  <p>The file <code>scripts/codegen/batch/wave1.json</code> already contains 5 tools ready to generate: JWT Decoder, Japanese Word Counter, Color Converter, Hash Generator, and Markdown Preview.</p>
+</section>
+
+<!-- TESTING -->
+<section id="testing" class="section">
+  <div class="page-header">
+    <div class="breadcrumb">AIStacker / <span>Testing a Tool</span></div>
+    <h1>How to Test a Generated Tool</h1>
+    <p class="lead">The generator produces a <code>REVIEW.md</code> with a specific checklist. Here's how to work through it systematically.</p>
+  </div>
+
+  <h2>The REVIEW.md checklist</h2>
+  <p>Every generated tool produces a <code>REVIEW.md</code> in <code>./output/</code>. Open it first.</p>
+  <pre><span class="cmd">cat</span> output/REVIEW.md</pre>
+  <p>It contains: the feature checklist, static check results (errors and warnings), and the registry snippets to paste.</p>
+
+  <h2>Manual testing steps</h2>
+
+  <ul class="checklist">
+    <li>
+      <span class="check-icon pass">✓</span>
+      <div>
+        <strong>Start dev server</strong><br>
+        <code>npm run dev</code> → open <code>http://localhost:3000/tools/{tool-id}</code>
+      </div>
+    </li>
+    <li>
+      <span class="check-icon pass">✓</span>
+      <div>
+        <strong>Test every feature in REVIEW.md</strong><br>
+        Each feature you specified in <code>--features</code> is a numbered checkbox. Verify each one works.
+      </div>
+    </li>
+    <li>
+      <span class="check-icon pass">✓</span>
+      <div>
+        <strong>Empty input</strong><br>
+        Clear all inputs and trigger the action. Tool must show a graceful error state, not crash or show a blank screen.
+      </div>
+    </li>
+    <li>
+      <span class="check-icon pass">✓</span>
+      <div>
+        <strong>Invalid input</strong><br>
+        For parsers (JSON, JWT, Regex): enter garbage. Expect an inline error message, not a thrown exception.
+      </div>
+    </li>
+    <li>
+      <span class="check-icon pass">✓</span>
+      <div>
+        <strong>Copy buttons</strong><br>
+        Every copy button must visually confirm success (e.g., "Copied ✓" for 1.5s). No <code>alert()</code> popups.
+      </div>
+    </li>
+    <li>
+      <span class="check-icon pass">✓</span>
+      <div>
+        <strong>Dark mode</strong><br>
+        Add <code>class="dark"</code> to <code>&lt;html&gt;</code> in DevTools. All text must remain readable. No white boxes on dark backgrounds.
+      </div>
+    </li>
+    <li>
+      <span class="check-icon warn-c">⚠</span>
+      <div>
+        <strong>Mobile layout (375px)</strong><br>
+        Resize browser to 375px. Buttons must not overflow. Two-column layouts must stack.
+      </div>
+    </li>
+    <li>
+      <span class="check-icon warn-c">⚠</span>
+      <div>
+        <strong>Large input</strong><br>
+        Paste 10,000 characters. The tool must not freeze the browser tab (check for O(n²) re-renders).
+      </div>
+    </li>
+    <li>
+      <span class="check-icon pass">✓</span>
+      <div>
+        <strong>SEO content below the tool</strong><br>
+        Scroll down. The intro, usage, example, use cases, and FAQ sections must all render with correct formatting.
+      </div>
+    </li>
+  </ul>
+
+  <h2>Checking static check warnings</h2>
+  <p>REVIEW.md lists any warnings from the static checker. These are not blocking errors but should be fixed before shipping:</p>
+  <pre><span class="c">## Static check result
+Errors: 0
+Warnings: 2
+
+- [WARN] hardcoded-color (line 34): Hardcoded Tailwind color found.
+- [WARN] a11y-input-label (line 61): &lt;input&gt; has no id or aria-label.</span></pre>
+
+  <p>Fix these manually in the generated file or re-run with a stronger <code>--features</code> description.</p>
+
+  <h2>What passes vs fails automatically</h2>
+  <div class="badges">
+    <span class="badge green">✓ component name matches</span>
+    <span class="badge green">✓ "use client" directive</span>
+    <span class="badge green">✓ shadcn imports via @/components/ui</span>
+    <span class="badge green">✓ no alert() calls</span>
+    <span class="badge amber">⚠ hardcoded Tailwind colors</span>
+    <span class="badge amber">⚠ inputs without labels</span>
+    <span class="badge amber">⚠ icon buttons without aria-label</span>
+    <span class="badge amber">⚠ useEffect empty deps array</span>
+  </div>
+</section>
+
+<!-- UPGRADE -->
+<section id="upgrade" class="section">
+  <div class="page-header">
+    <div class="breadcrumb">AIStacker / <span>Upgrading a Tool</span></div>
+    <h1>How to Upgrade an Existing Tool</h1>
+    <p class="lead">The generator detects slug conflicts and refuses to overwrite. Upgrading requires a deliberate workflow.</p>
+  </div>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠</span>
+    <p>Running <code>generate-tool</code> with an existing <code>--id</code> will fail immediately with <code>registry_conflict</code>. This is intentional — upgrades require the steps below.</p>
+  </div>
+
+  <h2>Option A — Regenerate and replace manually</h2>
+  <p>Use this when you want full control over what changes.</p>
+  <pre><span class="c"># 1. Generate to ./output (does NOT touch the project)</span>
+<span class="cmd">npx tsx</span> scripts/generate-tool.ts \
+  <span class="k">--id</span>       <span class="s">"regex-tester"</span> \
+  <span class="k">--name</span>     <span class="s">"Regex Tester"</span> \
+  <span class="k">--desc</span>     <span class="s">"Test regex with real-time highlighting, flag toggles, and group capture breakdown."</span> \
+  <span class="k">--features</span> <span class="s">"pattern input,flag toggles g i m s,live match highlighting,group capture panel,match count,copy pattern"</span>
+
+<span class="c"># 2. Review output/RegexTester.tsx vs existing component</span>
+<span class="cmd">diff</span> output/RegexTester.tsx components/tools/RegexTester.tsx
+
+<span class="c"># 3. If satisfied, replace</span>
+<span class="cmd">cp</span> output/RegexTester.tsx components/tools/RegexTester.tsx
+
+<span class="c"># 4. Update data/tools.ts manually if description/tags changed
+#    (the registry entry is in output/REVIEW.md for reference)</span></pre>
+
+  <h2>Option B — Rename slug to force regeneration</h2>
+  <p>Use this when you want a completely fresh registry entry (e.g., the old tool had a poor SEO description).</p>
+  <pre><span class="c"># 1. Delete old entry from data/tools.ts and lib/toolRegistry.ts</span>
+<span class="c"># 2. Delete old component file</span>
+<span class="cmd">rm</span> components/tools/RegexTester.tsx
+
+<span class="c"># 3. Now generate-tool will accept the slug again</span>
+<span class="cmd">npx tsx</span> scripts/generate-tool.ts \
+  <span class="k">--id</span> <span class="s">"regex-tester"</span> ... \
+  <span class="k">--project-dir</span> <span class="s">.</span></pre>
+
+  <h2>Targeted feature upgrade (manual)</h2>
+  <p>When you only need to add one feature to an existing tool, editing directly is faster than regenerating:</p>
+  <pre><span class="c"># Open the component</span>
+<span class="cmd">code</span> components/tools/RegexTester.tsx
+
+<span class="c"># Ask your editor AI or Claude:
+# "Add a match count display below the test string textarea.
+#  Show '3 matches' in muted text. Use the existing regex state.
+#  Follow the shadcn token conventions already in this file."</span></pre>
+
+  <div class="callout tip">
+    <span class="callout-icon">✓</span>
+    <p><strong>Rule of thumb:</strong> Use the generator for new tools and large rewrites. For adding 1–2 features to an existing tool, edit the component directly — it's faster and safer than regenerating.</p>
+  </div>
+</section>
+
+<!-- STATIC CHECKER -->
+<section id="checker" class="section">
+  <div class="page-header">
+    <div class="breadcrumb">AIStacker / <span>Static Checker</span></div>
+    <h1>Static Checker Rules</h1>
+    <p class="lead">The checker runs automatically after every LLM response. Errors block output and trigger a fix prompt. Warnings are recorded in REVIEW.md but don't block.</p>
+  </div>
+
+  <table class="param-table">
+    <thead>
+      <tr><th>Rule</th><th>Severity</th><th>What it catches</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>use-client</td>
+        <td style="color:var(--red)">error</td>
+        <td>File does not start with <code>"use client"</code>. All tool components are client components.</td>
+      </tr>
+      <tr>
+        <td>component-name</td>
+        <td style="color:var(--red)">error</td>
+        <td>The <code>export default function</code> name doesn't match the PascalCase of <code>--id</code>. Prevents import failures in toolRegistry.</td>
+      </tr>
+      <tr>
+        <td>shadcn-import</td>
+        <td style="color:var(--red)">error</td>
+        <td>Importing directly from <code>radix-ui</code> or <code>@radix-ui/react-*</code> instead of <code>@/components/ui/*</code>.</td>
+      </tr>
+      <tr>
+        <td>no-alert</td>
+        <td style="color:var(--red)">error</td>
+        <td>Use of <code>alert()</code>. Must be replaced with inline copied-state feedback.</td>
+      </tr>
+      <tr>
+        <td>hardcoded-color</td>
+        <td style="color:var(--amber)">warn</td>
+        <td>Tailwind palette classes like <code>text-gray-500</code>, <code>bg-slate-100</code>. Must use semantic tokens instead.</td>
+      </tr>
+      <tr>
+        <td>a11y-button-label</td>
+        <td style="color:var(--amber)">warn</td>
+        <td>Icon-only button without <code>aria-label</code>.</td>
+      </tr>
+      <tr>
+        <td>a11y-input-label</td>
+        <td style="color:var(--amber)">warn</td>
+        <td><code>&lt;input&gt;</code> without <code>id</code> or <code>aria-label</code>.</td>
+      </tr>
+      <tr>
+        <td>hooks-effect-deps</td>
+        <td style="color:var(--amber)">warn</td>
+        <td><code>useEffect</code> with empty <code>[]</code> dependency array — flags potential stale closure bugs.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Reading the error output</h2>
+  <pre><span class="c"># In the terminal when a check fails:</span>
+<span class="h">[gen] Static check failed (2 errors):</span>
+component-name: Component is named "MyTool" but must be "JwtDecoder".
+no-alert: alert() is not allowed. Use inline copied state. (line 47)
+
+<span class="c"># In REVIEW.md:</span>
+Errors: 0
+Warnings: 1
+- [WARN] hardcoded-color (line 34): Use semantic tokens.</pre>
+</section>
+
+<!-- PROMPTS -->
+<section id="prompts" class="section">
+  <div class="page-header">
+    <div class="breadcrumb">AIStacker / <span>Writing Good Prompts</span></div>
+    <h1>Writing Good Feature Lists</h1>
+    <p class="lead">The <code>--features</code> flag is the single biggest lever on output quality. The description and features together determine 90% of what the LLM builds.</p>
+  </div>
+
+  <h2>The core rule</h2>
+  <p>Features are instructions to the LLM, not user stories. Write them as specific UI behaviors, not abstract goals.</p>
+
+  <h3>❌ Too vague</h3>
+  <pre><span class="k">--features</span> <span class="s">"encode and decode,copy,clear"</span></pre>
+
+  <h3>✓ Specific and actionable</h3>
+  <pre><span class="k">--features</span> <span class="s">"encode text to base64 on button click,decode base64 to text on button click,show error for invalid base64 input,copy result to clipboard with 1.5s copied feedback,clear both fields button,live character count on input"</span></pre>
+
+  <h2>Feature anatomy</h2>
+  <p>A good feature entry has three parts: <strong>what UI element</strong>, <strong>what trigger</strong>, and <strong>what result</strong>.</p>
+
+  <table class="param-table">
+    <thead><tr><th>Pattern</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>input + action</td>
+        <td>"paste JSON and press Format button to see prettified output"</td>
+      </tr>
+      <tr>
+        <td>live/reactive</td>
+        <td>"live match count updates as user types the pattern"</td>
+      </tr>
+      <tr>
+        <td>error state</td>
+        <td>"show red inline error when JSON is invalid, with line number"</td>
+      </tr>
+      <tr>
+        <td>copy behavior</td>
+        <td>"copy result button shows 'Copied ✓' for 1.5s then resets"</td>
+      </tr>
+      <tr>
+        <td>mode toggle</td>
+        <td>"toggle between encode and decode modes, preserves input"</td>
+      </tr>
+      <tr>
+        <td>output format</td>
+        <td>"show all four hashes simultaneously in a grid, not a dropdown"</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Description quality matters for SEO</h2>
+  <p>The <code>--desc</code> is used verbatim in the tool card and meta description. Write it for a search engine result snippet.</p>
+
+  <h3>❌ Generic</h3>
+  <pre><span class="k">--desc</span> <span class="s">"A tool that converts colors."</span></pre>
+  <h3>✓ Specific + keyword-rich</h3>
+  <pre><span class="k">--desc</span> <span class="s">"Convert colors between HEX, RGB, HSL, and HSB formats with a live color swatch preview."</span></pre>
+
+  <h2>Feature count vs quality</h2>
+  <div class="callout info">
+    <span class="callout-icon">ℹ</span>
+    <p><strong>Sweet spot: 5–8 features.</strong> Under 4 features → the LLM adds filler. Over 12 → the component becomes too large to generate reliably in one pass and static checks start failing. For complex tools, split them: one generation per major mode.</p>
+  </div>
+</section>
+
+<!-- META-PROMPT -->
+<section id="meta-prompt" class="section">
+  <div class="page-header">
+    <div class="breadcrumb">AIStacker / <span>LLM → Prompt</span></div>
+    <h1>Use an LLM to Write Your Prompts</h1>
+    <p class="lead">Yes — using an LLM to expand your natural language idea into a precise <code>generate-tool</code> command is the right approach. Here's exactly how.</p>
+  </div>
+
+  <h2>The meta-prompt</h2>
+  <p>Copy this prompt and use it with Claude, ChatGPT, or Gemini. Replace the last line with your tool idea.</p>
+
+  <pre><span class="c">You are helping me prepare a command for a tool generator called generate-tool.
+The generator accepts these parameters:</span>
+
+<span class="s">--id       kebab-case slug (URL-safe, unique)
+--name     Display name
+--desc     One-sentence SEO description, max 160 chars, specific and keyword-rich
+--features Comma-separated list of specific UI behaviors the tool must implement
+--category One of: formatter encoder generator tester converter japanese text number color image network crypto</span>
+
+<span class="c">Rules for --features:
+- Each feature describes a specific UI behavior: what element, what trigger, what result
+- Include error states ("show inline error when X is invalid")
+- Include copy behavior ("copy button shows 'Copied ✓' for 1.5s")
+- Include live/reactive behavior if appropriate ("updates as user types")
+- 5-8 features is the sweet spot
+- No vague items like "good UX" or "easy to use"
+
+My tool idea: [YOUR IDEA IN PLAIN LANGUAGE]
+
+Output ONLY the generate-tool command, ready to run. No explanation.</span></pre>
+
+  <h2>Example: from idea to command</h2>
+
+  <h3>Your input to the LLM</h3>
+  <pre><span class="c">My tool idea: I want a tool that lets users convert between
+different number bases — like decimal, hex, binary, and octal.
+Should be easy to use and show all conversions at once.</span></pre>
+
+  <h3>LLM output</h3>
+  <pre><span class="cmd">npx tsx</span> scripts/generate-tool.ts \
+  <span class="k">--id</span>       <span class="s">"number-base-converter"</span> \
+  <span class="k">--name</span>     <span class="s">"Number Base Converter"</span> \
+  <span class="k">--desc</span>     <span class="s">"Convert numbers between decimal, binary, octal, and hexadecimal bases instantly."</span> \
+  <span class="k">--features</span> <span class="s">"decimal input field that updates all other bases live,binary output (base 2),octal output (base 8),hexadecimal output (base 16) with uppercase letters,show error for non-numeric input,copy individual output with 1.5s feedback,clear all button"</span> \
+  <span class="k">--category</span> <span class="s">"converter"</span></pre>
+
+  <h2>Why this works well</h2>
+  <p>The meta-prompt forces the LLM to translate abstract ideas ("easy to use", "show all conversions") into concrete UI specifications that <code>generate-tool</code> can act on. You get the convenience of natural language with the precision of a spec.</p>
+
+  <div class="callout tip">
+    <span class="callout-icon">✓</span>
+    <p><strong>Best workflow:</strong> Describe your idea to an LLM → get the command → run it → check REVIEW.md → fix any warnings → commit. The whole cycle typically takes under 5 minutes per tool.</p>
+  </div>
+
+  <h2>Iterating on a bad result</h2>
+  <p>If the generated tool is missing something or got a feature wrong, feed the REVIEW.md back to the LLM:</p>
+  <pre><span class="c">Here is the REVIEW.md from a generated tool:
+[paste REVIEW.md]
+
+The tool is missing the group capture panel feature.
+Give me an updated --features list that adds it clearly,
+and keep all the existing features.</span></pre>
+</section>
+
+<!-- BUILDER -->
+<section id="builder" class="section">
+  <div class="page-header">
+    <div class="breadcrumb">AIStacker / <span>Command Builder</span></div>
+    <h1>Interactive Command Builder</h1>
+    <p class="lead">Fill in the form to generate a ready-to-run command.</p>
+  </div>
+
+  <div class="builder">
+    <label for="b-id">Tool ID <span style="color:var(--red)">*</span></label>
+    <input id="b-id" type="text" placeholder="jwt-decoder" oninput="buildCmd()" />
+
+    <label for="b-name">Display Name <span style="color:var(--red)">*</span></label>
+    <input id="b-name" type="text" placeholder="JWT Decoder" oninput="buildCmd()" />
+
+    <label for="b-desc">Description (SEO) <span style="color:var(--red)">*</span></label>
+    <input id="b-desc" type="text" placeholder="Decode and inspect JWT tokens — header, payload, expiry — in your browser." oninput="buildCmd()" />
+
+    <label>Features <span style="color:var(--red)">*</span></label>
+    <div class="feature-list" id="feature-list">
+      <div class="feature-row">
+        <input type="text" placeholder="decode header as formatted JSON" oninput="buildCmd()" />
+        <button onclick="removeFeature(this)" title="Remove">✕</button>
+      </div>
+      <div class="feature-row">
+        <input type="text" placeholder="decode payload as formatted JSON" oninput="buildCmd()" />
+        <button onclick="removeFeature(this)" title="Remove">✕</button>
+      </div>
+      <div class="feature-row">
+        <input type="text" placeholder="show expiry status with relative time" oninput="buildCmd()" />
+        <button onclick="removeFeature(this)" title="Remove">✕</button>
+      </div>
+    </div>
+    <button class="add-feature" onclick="addFeature()">+ Add feature</button>
+
+    <label for="b-category">Category</label>
+    <select id="b-category" onchange="buildCmd()">
+      <option value="">auto-detect</option>
+      <option>formatter</option>
+      <option>encoder</option>
+      <option>generator</option>
+      <option>tester</option>
+      <option>converter</option>
+      <option>japanese</option>
+      <option>text</option>
+      <option>number</option>
+      <option>color</option>
+      <option>image</option>
+      <option>network</option>
+      <option>crypto</option>
+    </select>
+
+    <label for="b-provider">Provider</label>
+    <select id="b-provider" onchange="buildCmd()">
+      <option value="auto">auto (recommended)</option>
+      <option>gemini</option>
+      <option>anthropic</option>
+      <option>ollama</option>
+      <option>groq</option>
+    </select>
+
+    <label for="b-project">Project dir (optional — leave blank to generate only)</label>
+    <input id="b-project" type="text" placeholder="/path/to/aistacker  or  ." oninput="buildCmd()" />
+
+    <div class="builder-actions">
+      <button class="btn-primary" onclick="buildCmd(); document.getElementById('cmd-output').classList.add('visible')">Generate Command</button>
+      <button class="btn-secondary" onclick="resetForm()">Reset</button>
+    </div>
+
+    <div id="cmd-output">
+      <pre id="cmd-pre" style="margin-top:0"><span class="c"># Fill in the fields above</span></pre>
+      <button class="copy-btn" id="copy-cmd-btn" onclick="copyCmd()">Copy</button>
+    </div>
+  </div>
+</section>
+
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'))
+  document.getElementById(id).classList.add('active')
+  event.currentTarget.classList.add('active')
+  window.scrollTo(0, 0)
+}
+
+// Copy buttons on pre blocks
+document.querySelectorAll('pre').forEach(pre => {
+  if (pre.id === 'cmd-pre') return
+  const btn = document.createElement('button')
+  btn.className = 'copy-btn'
+  btn.textContent = 'Copy'
+  btn.onclick = () => {
+    const text = pre.innerText.replace(/^Copy$/m, '').trim()
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!'
+      btn.classList.add('copied')
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied') }, 1500)
+    })
+  }
+  pre.appendChild(btn)
+})
+
+// ── Builder ──────────────────────────────────────────────────────────
+function getFeatures() {
+  return Array.from(document.querySelectorAll('#feature-list .feature-row input'))
+    .map(i => i.value.trim()).filter(Boolean)
+}
+
+function buildCmd() {
+  const id       = document.getElementById('b-id').value.trim()
+  const name     = document.getElementById('b-name').value.trim()
+  const desc     = document.getElementById('b-desc').value.trim()
+  const features = getFeatures()
+  const cat      = document.getElementById('b-category').value
+  const provider = document.getElementById('b-provider').value
+  const proj     = document.getElementById('b-project').value.trim()
+
+  if (!id && !name && !desc && features.length === 0) {
+    document.getElementById('cmd-pre').innerHTML = '<span class="c"># Fill in the fields above</span>'
+    return
+  }
+
+  let cmd = 'npx tsx scripts/generate-tool.ts'
+  if (id)      cmd += `\n  --id       "${id}"`
+  if (name)    cmd += `\n  --name     "${name}"`
+  if (desc)    cmd += `\n  --desc     "${desc}"`
+  if (features.length) cmd += `\n  --features "${features.join(',')}"`
+  if (cat)     cmd += `\n  --category "${cat}"`
+  if (provider !== 'auto') cmd += `\n  --provider ${provider}`
+  if (proj)    cmd += `\n  --project-dir "${proj}"`
+
+  // Syntax highlight
+  cmd = cmd
+    .replace(/^(npx tsx \S+)/m, '<span class="cmd">$1</span>')
+    .replace(/(--\w[\w-]*)/g, '<span class="k">$1</span>')
+    .replace(/"([^"]*)"/g, '<span class="s">"$1"</span>')
+
+  document.getElementById('cmd-pre').innerHTML = cmd
+  document.getElementById('cmd-output').classList.add('visible')
+}
+
+function addFeature() {
+  const row = document.createElement('div')
+  row.className = 'feature-row'
+  row.innerHTML = `<input type="text" placeholder="describe a specific UI behavior..." oninput="buildCmd()" /><button onclick="removeFeature(this)" title="Remove">✕</button>`
+  document.getElementById('feature-list').appendChild(row)
+  row.querySelector('input').focus()
+}
+
+function removeFeature(btn) {
+  const list = document.getElementById('feature-list')
+  if (list.children.length > 1) {
+    btn.parentElement.remove()
+    buildCmd()
+  }
+}
+
+function copyCmd() {
+  const text = document.getElementById('cmd-pre').innerText
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-cmd-btn')
+    btn.textContent = 'Copied!'
+    btn.classList.add('copied')
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied') }, 1500)
+  })
+}
+
+function resetForm() {
+  document.getElementById('b-id').value = ''
+  document.getElementById('b-name').value = ''
+  document.getElementById('b-desc').value = ''
+  document.getElementById('b-category').value = ''
+  document.getElementById('b-provider').value = 'auto'
+  document.getElementById('b-project').value = ''
+  const list = document.getElementById('feature-list')
+  list.innerHTML = `
+    <div class="feature-row"><input type="text" placeholder="describe a specific UI behavior..." oninput="buildCmd()" /><button onclick="removeFeature(this)" title="Remove">✕</button></div>
+  `
+  document.getElementById('cmd-output').classList.remove('visible')
+}
+</script>
+</body>
+</html>

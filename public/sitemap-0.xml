@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://aistacker.isekai.workers.dev</loc><lastmod>2026-03-15T15:03:33.494Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aistacker.isekai.workers.dev/tools/base64-encode</loc><lastmod>2026-03-15T15:03:33.496Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aistacker.isekai.workers.dev/tools/json-formatter</loc><lastmod>2026-03-15T15:03:33.496Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aistacker.isekai.workers.dev/tools/regex-tester</loc><lastmod>2026-03-15T15:03:33.496Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aistacker.isekai.workers.dev/tools/timestamp-converter</loc><lastmod>2026-03-15T15:03:33.496Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aistacker.isekai.workers.dev/tools/url-decode</loc><lastmod>2026-03-15T15:03:33.496Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aistacker.isekai.workers.dev/tools/url-encode</loc><lastmod>2026-03-15T15:03:33.496Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://aistacker.isekai.workers.dev/tools/uuid-generator</loc><lastmod>2026-03-15T15:03:33.496Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://aistacker.dev</loc><lastmod>2026-03-20T16:09:06.072Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://aistacker.dev/tools/base64-encode</loc><lastmod>2026-03-20T16:09:06.073Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://aistacker.dev/tools/japanese-word-count</loc><lastmod>2026-03-20T16:09:06.073Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://aistacker.dev/tools/json-formatter</loc><lastmod>2026-03-20T16:09:06.073Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://aistacker.dev/tools/jwt-decoder</loc><lastmod>2026-03-20T16:09:06.073Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://aistacker.dev/tools/markdown-preview</loc><lastmod>2026-03-20T16:09:06.073Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://aistacker.dev/tools/regex-tester</loc><lastmod>2026-03-20T16:09:06.073Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://aistacker.dev/tools/timestamp-converter</loc><lastmod>2026-03-20T16:09:06.073Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://aistacker.dev/tools/url-decode</loc><lastmod>2026-03-20T16:09:06.073Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://aistacker.dev/tools/url-encode</loc><lastmod>2026-03-20T16:09:06.073Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://aistacker.dev/tools/uuid-generator</loc><lastmod>2026-03-20T16:09:06.074Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://aistacker.dev/tools</loc><lastmod>2026-03-20T16:09:06.074Z</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
 </urlset>

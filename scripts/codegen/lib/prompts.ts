@@ -1,71 +1,98 @@
 // scripts/codegen/lib/prompts.ts
-// All LLM prompts for the TSX component generator.
-// Every known failure mode has a WRONG/RIGHT pair to pre-empt it.
+//
+// KEY CHANGES vs previous version:
+//
+// 1. TWO-PASS STRATEGY
+//    Pass 1: Generate ONLY the component TSX. No metadata sections.
+//            This eliminates the "use-client missing" failure — the LLM
+//            only has to do one job per response.
+//    Pass 2: Given the completed component, generate all metadata sections.
+//            Much more reliable because the LLM isn't juggling both tasks.
+//
+// 2. EXPLICIT "use client" PLACEMENT
+//    Previous prompt said it was required but never showed WHERE.
+//    New prompt shows the exact first two lines with a concrete example.
+//
+// 3. QUALITY FLOOR
+//    The prompt now shows a reference-quality component excerpt so the LLM
+//    calibrates to "production tool" not "tutorial skeleton".
+//    Features like keyboard shortcuts, error boundaries, loading states,
+//    and copy feedback are specified as non-optional defaults.
+//
+// 4. METADATA-ONLY FIX PROMPT
+//    When metadata is missing, sends a targeted prompt for metadata only,
+//    not a full regeneration. Saves tokens and retries.
 
 import type { ComponentRequest } from "./contract.js"
 import type { StaticCheckResult } from "./staticChecker.js"
 
-// ── Main generation prompt ────────────────────────────────────────────────────
+// ── Pass 1: component only ────────────────────────────────────────────────────
 
-export function buildGenerationPrompt(req: ComponentRequest): string {
+export function buildComponentPrompt(req: ComponentRequest): string {
   const componentName = toPascalCase(req.toolId)
   const featureList   = req.features.map((f, i) => `${i + 1}. ${f}`).join("\n")
 
-  return `You are an expert Next.js / React developer. Generate a production-quality tool component.
+  return `You are a senior React/Next.js engineer. Generate a single production-quality tool component.
 
-## Component spec
-- Tool ID:    ${req.toolId}
-- Name:       ${req.displayName}
-- Component:  ${componentName}
-- Description: ${req.description}
-- Category:   ${req.category ?? "auto-detect"}
+## Spec
+Component name: ${componentName}
+Tool name:      ${req.displayName}
+Description:    ${req.description}
+Category:       ${req.category ?? "auto-detect"}
 
-## Required features (you MUST implement ALL of them)
+## Required features — implement ALL of them, no exceptions
 ${featureList}
 
-## Technology constraints
-- React 19 with hooks ("use client" directive required)
-- Tailwind CSS v4 — use semantic tokens ONLY (see rules below)
-- shadcn/ui components imported from "@/components/ui/*"
+## Non-negotiable quality standards
+Every tool must have:
+- Keyboard shortcut: Ctrl/Cmd+Enter triggers the primary action
+- Copy button: shows "Copied ✓" inline for 1500ms then resets (never alert())
+- Error state: invalid input shows a clear inline error message, never crashes
+- Empty state: graceful placeholder when fields are empty
+- Loading state: if processing takes time, show a spinner or disabled button
+
+## Technology
+- React 19 ("use client" directive is MANDATORY — first line of file)
+- Tailwind CSS v4 with semantic tokens ONLY
 - lucide-react for icons
-- NO external libraries beyond what is listed above
+- No external libraries (no marked, no prism, no highlight.js, no react-markdown)
+- If you need markdown rendering: implement a minimal renderer using regex/DOM
+- If you need syntax highlighting: use a <pre> with className="language-xxx"
 
-## Tailwind rules
-WRONG: className="text-gray-500"
-RIGHT: className="text-muted-foreground"
+## Tailwind — semantic tokens only
+WRONG: text-gray-500   → RIGHT: text-muted-foreground
+WRONG: bg-gray-100     → RIGHT: bg-muted
+WRONG: bg-white        → RIGHT: bg-background
+WRONG: text-slate-900  → RIGHT: text-foreground
+WRONG: border-gray-200 → RIGHT: border-border
+WRONG: bg-blue-500 text-white → RIGHT: bg-primary text-primary-foreground
+WRONG: text-red-500    → RIGHT: text-destructive
 
-WRONG: className="bg-gray-100 dark:bg-gray-800"
-RIGHT: className="bg-muted"
-
-WRONG: className="border-gray-200"
-RIGHT: className="border-border"
-
-WRONG: className="text-slate-900"
-RIGHT: className="text-foreground"
-
-WRONG: className="bg-white"
-RIGHT: className="bg-background"
-
-WRONG: className="bg-blue-500 text-white"
-RIGHT: className="bg-primary text-primary-foreground"
-
-## Import rules
-WRONG: import { Button } from "react"
+## Imports — shadcn must use @/components/ui
+WRONG: import { Button } from "radix-ui"
 RIGHT: import { Button } from "@/components/ui/button"
 
-WRONG: import { useState } from "react"  // only if you also need other hooks
-RIGHT: import { useState, useCallback, useMemo } from "react"
+## Exact file structure — follow this precisely
+\`\`\`
+"use client"
+                                     ← blank line after directive
+import { useState, useCallback, ... } from "react"
+import { ... } from "lucide-react"
+import { ... } from "@/components/ui/..."
+                                     ← blank line
+export default function ${componentName}() {
+  ...
+}
+\`\`\`
 
-## State rules
-WRONG: let result = ""
-RIGHT: const [result, setResult] = useState("")
+## Copy-to-clipboard — always use this exact pattern
+\`\`\`tsx
+const [copied, setCopied] = useState<string | null>(null)
 
-## Copy to clipboard — always use this exact pattern
-const copyToClipboard = async (text: string) => {
+const copyToClipboard = useCallback(async (text: string, id: string) => {
   try {
     await navigator.clipboard.writeText(text)
   } catch {
-    // Fallback for HTTP contexts
     const el = document.createElement("textarea")
     el.value = text
     document.body.appendChild(el)
@@ -73,101 +100,166 @@ const copyToClipboard = async (text: string) => {
     document.execCommand("copy")
     document.body.removeChild(el)
   }
+  setCopied(id)
+  setTimeout(() => setCopied(null), 1500)
+}, [])
+\`\`\`
+Copy button JSX: \`<button onClick={() => copyToClipboard(text, "result")}>{copied === "result" ? "Copied ✓" : "Copy"}</button>\`
+
+## Output format — CRITICAL
+Output ONLY the raw file content. No explanation, no prose, no markdown fence.
+Start the response with exactly this string (including the quotes):
+"use client"
+
+The response must end with the closing brace of the component. Nothing else.`
 }
 
-## UX rules
-WRONG: alert("Copied!")
-RIGHT: use a useState boolean to show an inline "Copied ✓" state for 1.5 s
+// ── Pass 2: metadata only (given completed component) ────────────────────────
 
-WRONG: <button onClick={handleProcess}>Go</button>  // no aria-label when icon-only
-RIGHT: <button onClick={handleProcess} aria-label="Process input">Go</button>
+export function buildMetadataPrompt(req: ComponentRequest, componentCode: string): string {
+  return `Given this completed React component for the tool "${req.displayName}", generate the metadata sections below.
 
-WRONG: <input id="inp" />  // label not connected
-RIGHT: <label htmlFor="inp">Input</label><input id="inp" />
+## Component (for context — do NOT regenerate it)
+\`\`\`tsx
+${componentCode.slice(0, 800)}${componentCode.length > 800 ? "\n... (truncated)" : ""}
+\`\`\`
 
-## Component file rules
-WRONG: export default function MyCustomName() {   // name differs from spec
-RIGHT: export default function ${componentName}() {  // EXACTLY this name
-
-## Output format
-Respond with EXACTLY this structure — no prose before or after:
-
-=== COMPONENT ===
-(the complete .tsx file content, starting with "use client")
-=== END COMPONENT ===
+## Output — use EXACTLY these delimiters, one section at a time
 
 === CATEGORY ===
-(single word from: formatter encoder generator tester converter japanese text number color image network crypto)
+${req.category ?? "(one word from: formatter encoder generator tester converter japanese text number color image network crypto)"}
 === END CATEGORY ===
 
 === TAGS ===
-(comma-separated lowercase tags, 5–10 items, no spaces around commas)
+(5–8 comma-separated lowercase tags relevant to this tool)
 === END TAGS ===
 
 === SEO_TITLE ===
-(title tag text, max 60 chars, no site name suffix)
+(page title, max 60 chars, specific and keyword-rich, no brand name)
 === END SEO_TITLE ===
 
 === SEO_DESC ===
-(meta description, 120–160 chars)
+(meta description 120–155 chars, what the tool does and its key benefits)
 === END SEO_DESC ===
 
 === INTRO ===
-(2–3 sentence intro paragraph for the SEO article)
+(2 sentences: what the tool is and why developers need it)
 === END INTRO ===
 
 === USAGE ===
-(2–3 sentence usage instructions)
+(2 sentences: how to use the tool step by step)
 === END USAGE ===
 
 === EXAMPLE ===
-(plain text example showing input → output, use \\n for newlines, no markdown)
+(concrete input/output example as plain text, use actual values not placeholders)
 === END EXAMPLE ===
 
 === USE_CASES ===
-(4–6 numbered use cases, one per line, format: "1. Use case text.")
+1. (specific use case)
+2. (specific use case)
+3. (specific use case)
+4. (specific use case)
 === END USE_CASES ===
 
 === FAQ ===
-(2–3 FAQ items in format: Q: question\\nA: answer — separated by blank lines)
+Q: (common question)
+A: (direct answer)
+
+Q: (common question)
+A: (direct answer)
 === END FAQ ===
-`
+
+Output ONLY the sections above. No prose before or after.`
 }
 
-// ── Fix prompt (called on retry) ─────────────────────────────────────────────
+// ── Fix prompt for static check errors ───────────────────────────────────────
 
 export function buildFixPrompt(
   req: ComponentRequest,
   previousCode: string,
   checkResult: StaticCheckResult
 ): string {
-  const issues = checkResult.issues.map((i) => `- [${i.severity}] ${i.rule}: ${i.message} (line ${i.line ?? "?"})`).join("\n")
+  const componentName = toPascalCase(req.toolId)
+  const errors = checkResult.issues
+    .filter(i => i.severity === "error")
+    .map(i => `  - Line ${i.line ?? "?"}: [${i.rule}] ${i.message}`)
+    .join("\n")
 
-  return `The component you generated has the following issues. Fix ALL of them and return the FULL corrected file.
+  const warns = checkResult.issues
+    .filter(i => i.severity === "warn")
+    .map(i => `  - Line ${i.line ?? "?"}: [${i.rule}] ${i.message}`)
+    .join("\n")
 
-## Issues to fix
-${issues}
+  return `Fix the following issues in this React component. Return the COMPLETE corrected file.
+
+## Errors (MUST fix — these block deployment)
+${errors || "  none"}
+
+## Warnings (SHOULD fix)
+${warns || "  none"}
 
 ## Previous code
 \`\`\`tsx
 ${previousCode}
 \`\`\`
 
-## Requirements reminder
-- Component must be named: ${toPascalCase(req.toolId)}
-- All Tailwind classes must use semantic tokens (text-muted-foreground, bg-muted, etc.)
-- All imports must use @/components/ui/* for shadcn
-- No alert() calls — use inline copied state
-- All inputs must have associated labels (htmlFor / aria-label)
+## Fix rules
+- FIRST LINE must be exactly: "use client"
+- Component must be: export default function ${componentName}()
+- Tailwind: replace ALL hardcoded palette classes (text-gray-*, bg-slate-*, etc.) with semantic tokens
+- Imports: shadcn components must come from "@/components/ui/componentname"
+- No alert() anywhere — use setCopied state pattern
+- Every <input> needs id= and a matching <label htmlFor=>
 
-Return ONLY the corrected .tsx file content starting with "use client". No explanation.`
+Return ONLY the corrected .tsx file content. Start with "use client". No explanation.`
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── Meta-prompt: natural language → ComponentRequest ─────────────────────────
+// Used by the --idea flag. Converts vague user input into a precise spec.
+
+export function buildIdeaToSpecPrompt(idea: string): string {
+  return `You are helping prepare a precise spec for a browser-based developer tool generator.
+
+The generator needs a ComponentRequest with these fields:
+- toolId: kebab-case URL slug, unique, descriptive
+- displayName: title-cased human name
+- description: one sentence, max 160 chars, SEO-optimized, specific (mention key formats/features)
+- category: exactly one of: formatter encoder generator tester converter japanese text number color image network crypto
+- tags: 6-10 lowercase search tags
+- features: array of 6-10 SPECIFIC UI behaviors
+
+Rules for features:
+- Each feature = one concrete UI behavior (what element, what trigger, what result)
+- Must include: an error state feature, a copy feature, at least one live/reactive feature
+- Must NOT include vague items like "good UX", "clean design", "easy to use"
+- Format: "verb + object + qualifier" — e.g. "show error message inline when input is invalid JSON"
+
+User's idea:
+"""
+${idea}
+"""
+
+Research this tool category. Think about:
+1. What do the top 3 tools in this category (e.g. jsonlint.com, json.cn) offer?
+2. What features do users complain are missing from existing tools?
+3. What would make this tool genuinely better than alternatives?
+
+Output ONLY valid JSON matching this TypeScript interface — no prose, no markdown:
+{
+  "toolId": string,
+  "displayName": string,
+  "description": string,
+  "category": string,
+  "tags": string[],
+  "features": string[]
+}`
+}
+
+// ── Helper ────────────────────────────────────────────────────────────────────
 
 export function toPascalCase(kebab: string): string {
   return kebab
     .split("-")
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
     .join("")
 }

@@ -70,3 +70,7 @@
     "category": "text"
   }
 ]
+
+
+// 把上面的Json按照如下格式改写
+// npx tsx scripts/generate-tool.ts \  --id "japanese-word-count" \  --name "Japanese Word Counter" \  --desc "Count hiragana, katakana, kanji, and total characters in Japanese text instantly." \  --features "count hiragana characters,count katakana characters,count kanji characters,count total characters (including spaces),count total characters (excluding spaces),live update as user types,copy summary to clipboard" \ --category japanese  \ --provider groq \ --project-dir .
