@@ -52,7 +52,7 @@ const parseMarkdown = (source: string): string => {
   converted = converted.replace(/^(>.*(?:\n>.*)*)/gm, (match, block) => {
     const lines = block.split('\n').map((line: string) => line.replace(/^>\s*/, ''));
     const innerHtml = lines.join('\n');
-    const paragraphs = innerHtml.split(/\n{2,}/).map(p => `<p>${p.trim().replace(/\n/g, '<br />')}</p>`).join('');
+    const paragraphs = innerHtml.split(/\n{2,}/).map((p: string) => `<p>${p.trim().replace(/\n/g, '<br />')}</p>`).join('');
     return `<blockquote class=\"border-l-4 border-slate-300 pl-4 italic text-slate-600 dark:text-slate-300 my-4\">${paragraphs}</blockquote>`;
   });
 
