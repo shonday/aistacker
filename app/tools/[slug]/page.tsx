@@ -1,6 +1,7 @@
 import { tools } from "@/data/tools";
 import { toolRegistry } from "@/lib/toolRegistry";
 import ToolLayout from "@/components/ToolLayout";
+import { siteConfig } from "@/lib/config";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
@@ -8,9 +9,6 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-/**
- * 修复一：校准 Metadata 路径
- */
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const params = await props.params;
   const tool = tools.find((t) => t.slug === params.slug);
@@ -18,19 +16,12 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   if (!tool) return { title: "Tool Not Found" };
 
   return {
-    title: `${tool.seo.title} | AIStacker`,
+    title: `${tool.seo.title} | ${siteConfig.name}`,
     description: tool.seo.description,
-    // 注入 Canonical 标签
     alternates: {
-      canonical: `https://aistacker.dev/tools/${tool.slug}`,
+      // 动态拼接 Canonical，绝对防止重复内容惩罚
+      canonical: `${siteConfig.url}/tools/${tool.slug}`,
     },
-    // 额外增强：针对爬虫的开放图谱
-    openGraph: {
-      title: tool.seo.title,
-      description: tool.seo.description,
-      url: `https://aistacker.dev/tools/${tool.slug}`,
-      type: 'website',
-    }
   };
 }
 
@@ -40,9 +31,6 @@ export async function generateStaticParams() {
   }));
 }
 
-/**
- * 修复二：确保数据完整传递给 Layout
- */
 export default async function ToolPage(props: PageProps) {
   const params = await props.params;
   const tool = tools.find((t) => t.slug === params.slug);
@@ -51,10 +39,9 @@ export default async function ToolPage(props: PageProps) {
 
   const Component = toolRegistry[tool.component];
 
-  // 内链系统
+  // 核心修复：废弃 Math.random()，改用严格的 Category 聚类推荐，提升 Topical Authority
   const relatedTools = tools
-    .filter((t) => t.slug !== params.slug)
-    .sort(() => 0.5 - Math.random())
+    .filter((t) => t.category === tool.category && t.slug !== tool.slug)
     .slice(0, 4)
     .map((t) => ({
       name: t.name,
@@ -63,25 +50,37 @@ export default async function ToolPage(props: PageProps) {
 
   return (
     <>
-      {/* 结构化数据补全 */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            "name": tool.name,
-            "applicationCategory": "DeveloperApplication",
-            "description": tool.description,
-            "operatingSystem": "Any",
-          }),
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": tool.name,
+              "applicationCategory": "DeveloperApplication",
+              "operatingSystem": "Web",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": tool.name,
+              "url": `${siteConfig.url}/tools/${tool.slug}`,
+              "applicationCategory": "DeveloperApplication",
+              "browserRequirements": "Requires JavaScript"
+            }
+          ]),
         }}
       />
       <ToolLayout
         h1={tool.name}
         description={tool.description}
         tool={<Component />}
-        // 确保传递的是 tool.content 对象
         content={tool.content}
         relatedTools={relatedTools}
       />
