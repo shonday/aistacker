@@ -15,4 +15,9 @@ export const toolRegistry: Record<string, React.ComponentType> = {
   TimestampConverter: dynamic(() => import("@/components/tools/TimestampConverter")),
   UrlEncoder:         dynamic(() => import("@/components/tools/UrlEncoder")),
   UrlDecoder:         dynamic(() => import("@/components/tools/UrlDecoder")),
+  JwtDecoder:         dynamic(() => import("@/components/tools/JwtDecoder")),
+  MarkdownPreview:    dynamic(() => import("@/components/tools/MarkdownPreview")),
+  JapaneseWordCount   : dynamic(() => import("@/components/tools/JapaneseWordCount")),
+
 }
+  

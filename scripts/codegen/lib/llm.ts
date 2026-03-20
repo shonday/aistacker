@@ -23,7 +23,7 @@ export interface LLMResponse {
 
 async function callOllama(prompt: string): Promise<string> {
   const base  = process.env.OLLAMA_BASE_URL ?? "http://localhost:11434"
-  const model = process.env.OLLAMA_MODEL    ?? "qwen2.5-coder:7b"
+  const model = process.env.OLLAMA_MODEL    ?? "qwen2.5-coder:1.5b"
 
   const res = await fetch(`${base}/api/generate`, {
     method: "POST",
