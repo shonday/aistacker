@@ -1,31 +1,42 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import Header from "@/components/Header";
+import type { Metadata } from "next"
+import { Geist, Geist_Mono } from "next/font/google"
+import "./globals.css"
+import { SiteHeader } from "@/components/layout/SiteHeader"
+import { SiteFooter } from "@/components/layout/SiteFooter"
+import { siteConfig } from "@/lib/config"
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "AIStacker | Free Developer & AI Tools Stack",
-  description: "Fast, secure, and privacy-focused online developer tools. Format JSON, encode Base64, generate UUIDs, and more directly in your browser.",
-  alternates: {
-    canonical: "https://aistacker.dev",
-  }
-};
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: `${siteConfig.name} | Free Developer & AI Tools`,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: ["developer tools", "json formatter", "base64 encoder", "uuid generator", "regex tester", "free online tools"],
+  authors: [{ name: siteConfig.name }],
+  openGraph: {
+    type: "website",
+    siteName: siteConfig.name,
+    locale: "en_US",
+  },
+  twitter: { card: "summary_large_image" },
+  robots: { index: true, follow: true },
+  alternates: { canonical: siteConfig.url },
+}
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 min-h-screen flex flex-col`}>
-        <Header />
-        <main className="flex-grow">
-          {children}
-        </main>
-        <footer className="border-t py-8 text-center text-slate-500 text-sm bg-white">
-          <p>© {new Date().getFullYear()} AIStacker.dev - All tools run locally in your browser.</p>
-        </footer>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-background text-foreground`}
+      >
+        <SiteHeader />
+        <main className="flex-1">{children}</main>
+        <SiteFooter />
       </body>
     </html>
-  );
+  )
 }
