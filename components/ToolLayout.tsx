@@ -32,7 +32,7 @@ export default function ToolLayout({ h1, description, tool, content, relatedTool
         </section>
 
         {/* SEO 深度文章区：这里是大兵的改良核心 */}
-        <article className="bg-white border border-slate-200 rounded-3xl p-8 md:p-12 shadow-sm">
+        <article className="prose prose-slate max-w-none lg:prose-lg">
           {/* 使用 prose 类名，并显式指定字体和颜色 */}
           <div className="prose prose-slate prose-lg max-w-none 
             prose-headings:font-bold prose-headings:text-slate-900
