@@ -1,48 +1,43 @@
 === CATEGORY ===
-japanese
+text analysis
 === END CATEGORY ===
 
 === TAGS ===
-japanese language, word count, character counter, text analysis, language tools
+japanese text, character counter, kanji counter, hiragana counter, katakana counter
 === END TAGS ===
 
 === SEO_TITLE ===
-Japanese Word Counter Tool
+Japanese Text Counter Tool
 === END SEO_TITLE ===
 
 === SEO_DESC ===
-Count Japanese words, characters, and kanji with this free tool. Analyze text and get instant results for hiragana, katakana, and kanji counts.
-=== END SEO_TITLE ===
+Count Japanese characters, including kanji, hiragana, and katakana, with this free online tool, perfect for language learners and developers needing to track character usage in their projects.
+=== END SEO_DESC ===
 
 === INTRO ===
-The Japanese Word Counter is a tool designed for developers and language learners to analyze Japanese text and count the number of words, characters, and kanji. This tool is essential for developers who need to work with Japanese text data and require accurate counting and analysis.
+The Ninja Text Counter is a handy tool for developers and language learners to count the number of Japanese characters in a given text, helping them understand and work with the unique aspects of the Japanese language. By using this tool, developers can easily track character usage in their projects and ensure compliance with specific requirements.
 === END INTRO ===
 
 === USAGE ===
-To use the Japanese Word Counter, simply paste or type the Japanese text into the input field and the tool will automatically count the words, characters, and kanji. The results are displayed in real-time, allowing users to quickly and easily analyze the text.
+To use the Ninja Text Counter, simply paste the Japanese text into the input field and the tool will automatically count the number of kanji, hiragana, and katakana characters, providing a total count as well. The tool also allows users to copy the results, making it easy to integrate the counted characters into their projects.
 === END USAGE ===
 
 === EXAMPLE ===
 Input: 
-Output: 
-Hiragana Count: 10
-Katakana Count: 5
-Kanji Count: 8
-Total Characters: 150
-Total Characters (no spaces): 140
+Output: Kanji: 5, Hiragana: 10, Katakana: 2, Total: 17
 === END EXAMPLE ===
 
 === USE_CASES ===
-1. Language learners can use the Japanese Word Counter to track their progress and analyze the complexity of Japanese texts.
-2. Developers can use the tool to validate Japanese text data and ensure accurate counting and analysis.
-3. Translators can use the tool to count the number of words and characters in Japanese texts for translation projects.
-4. Researchers can use the tool to analyze large datasets of Japanese text and identify trends and patterns.
+1. Language learners can use the Ninja Text Counter to track their progress in learning Japanese characters, focusing on specific scripts like kanji or hiragana.
+2. Developers can utilize the tool to count characters in Japanese text for projects requiring specific character limits, such as subtitles or captions.
+3. Content creators can use the Ninja Text Counter to optimize their Japanese content for better readability and engagement.
+4. Researchers can apply the tool to analyze the frequency and usage of different Japanese characters in various texts, gaining insights into linguistic patterns.
 === END USE_CASES ===
 
 === FAQ ===
-Q: How does the Japanese Word Counter handle different Japanese character sets?
-A: The tool supports hiragana, katakana, and kanji character sets, and can accurately count and analyze each type of character.
+Q: How does the Ninja Text Counter distinguish between kanji, hiragana, and katakana characters?
+A: The tool uses regular expressions to identify and count the different types of Japanese characters.
 
-Q: Can I copy the results from the Japanese Word Counter?
-A: Yes, the tool allows users to copy the results to the clipboard for further use.
+Q: Can I use the Ninja Text Counter for other languages besides Japanese?
+A: No, the Ninja Text Counter is specifically designed for counting Japanese characters and may not provide accurate results for other languages.
 === END FAQ ===
