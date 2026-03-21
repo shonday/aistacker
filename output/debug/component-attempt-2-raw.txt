@@ -1,0 +1,71 @@
+```tsx
+"use client"
+
+import { useState, useCallback } from "react"
+import { IoTextOutline } from "@lucide-react/icons"
+import { Button } from "@/components/ui/button"
+import { CopyToClipboard } from "@/components/copy-to-clipboard"
+
+const NinjaTextCount = () => {
+  const [text, setText] = useState("")
+  const [characters, setCharacters] = useState(0)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const value = e.target.value
+      try {
+        const count = new RegExp(/[\u3041-\u3096\u30A1-\u30FF\u4E00-\u9FFF]/g).test(value)
+          ? value.replace(/[\u3041-\u3096\u30A1-\u30FF\u4E00-\u9FFF]/g, "")
+          : value
+        setText(count)
+        setCharacters(count.length)
+      } catch (err) {
+        setError("Invalid Japanese text")
+      }
+    },
+    []
+  )
+
+  const copyToClipboard = useCallback(async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch {
+      const el = document.createElement("textarea")
+      el.value = text
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand("copy")
+      document.body.removeChild(el)
+    }
+    setCopied(id)
+    setTimeout(() => setCopied(null), 1500)
+  }, [])
+
+  return (
+    <div className="space-y-4">
+      <textarea
+        value={text}
+        onChange={handleInputChange}
+        placeholder="Enter Japanese text..."
+        rows={10}
+        className="w-full h-64 p-2 border rounded-lg shadow-md focus:outline-none focus:border-primary"
+      />
+      {error && (
+        <div className="p-2 border rounded-lg bg-red-500 text-white mt-2">
+          {error}
+        </div>
+      )}
+      <Button
+        disabled={text === ""}
+        onClick={() => copyToClipboard(text, "result")}
+        className="w-full p-2 bg-primary text-white rounded-lg shadow-md focus:outline-none focus:border-primary"
+      >
+        Copy ({characters} characters)
+      </Button>
+    </div>
+  )
+}
+
+export default NinjaTextCount
+```

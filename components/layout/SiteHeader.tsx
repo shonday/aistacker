@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Layers } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ThemeToggle } from "@/components/ThemeToggle"
 
 const NAV = [
   { href: "/",      label: "Home"      },
@@ -17,11 +18,13 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/90 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-6">
 
+        {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
           <Layers className="h-5 w-5" />
-          <span>AI<span className="text-primary">Stacker</span></span>
+          <span>AIStacker</span>
         </Link>
 
+        {/* Nav links */}
         <nav className="flex items-center gap-1">
           {NAV.map(({ href, label }) => (
             <Link
@@ -39,8 +42,10 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        {/* Right slot — future: dark mode toggle, GitHub star */}
-        <div className="ml-auto" />
+        {/* Right slot */}
+        <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   )
