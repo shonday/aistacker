@@ -1,17 +1,19 @@
-import Link                  from "next/link"
-import { ArrowRight }        from "lucide-react"
-import type { ToolMeta }     from "@/data/tools"
-import type { Messages }     from "@/lib/i18n"
-import { CATEGORY_LABELS }   from "@/data/tools"
-import { isNewTool }         from "@/data/tools"
-import { getToolBySlug }     from "@/data/tools"
+import Link               from "next/link"
+import { ArrowRight }     from "lucide-react"
+import type { ToolMeta }  from "@/data/tools"
+import type { Messages }  from "@/lib/i18n"
+import {
+  CATEGORY_LABELS,
+  isNewTool,
+  getToolBySlug,
+}                         from "@/data/tools"
 
 interface ToolLayoutProps {
   tool:           ToolMeta
   messages:       Messages
   toolComponent:  React.ReactNode
   relatedTools:   ToolMeta[]
-  locale?: string
+  locale?:        string      // "en" | "ja" | "zh" — default "en"
 }
 
 export default function ToolLayout({
@@ -19,21 +21,20 @@ export default function ToolLayout({
   messages: t,
   toolComponent,
   relatedTools,
+  locale = "en",
 }: ToolLayoutProps) {
-  const isNew = isNewTool(tool)
+  const isNew  = isNewTool(tool)
+  const base   = locale === "en" ? "" : `/${locale}`
 
-  // Build workflow tool objects
   const workflowBefore = tool.workflow.before
-    .map(s => getToolBySlug(s))
-    .filter(Boolean) as ToolMeta[]
+    .map(s => getToolBySlug(s)).filter(Boolean) as ToolMeta[]
   const workflowAfter  = tool.workflow.after
-    .map(s => getToolBySlug(s))
-    .filter(Boolean) as ToolMeta[]
+    .map(s => getToolBySlug(s)).filter(Boolean) as ToolMeta[]
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-12">
 
-      {/* ── Tool header ──────────────────────────────────────────── */}
+      {/* ── Header ───────────────────────────────────────────────── */}
       <header className="mb-8">
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <span className="rounded-full border border-border/60 bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">
@@ -56,7 +57,7 @@ export default function ToolLayout({
           {tool.tags.slice(0, 8).map(tag => (
             <Link
               key={tag}
-              href={`/tools?q=${encodeURIComponent(tag)}`}
+              href={`${base}/tools?q=${encodeURIComponent(tag)}`}
               className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-colors"
             >
               #{tag}
@@ -68,27 +69,32 @@ export default function ToolLayout({
       {/* ── Tool component ────────────────────────────────────────── */}
       <section className="mb-12 rounded-xl border border-border/60 bg-card p-5 shadow-sm sm:p-8">
         {toolComponent ?? (
-          <div className="flex in-h-50 items-center justify-center text-muted-foreground">
+          <div className="flex min-h-[200px] items-center justify-center text-muted-foreground">
             Component coming soon.
           </div>
         )}
       </section>
 
-      {/* ── Problems section (SEO: specific queries, not just tool name) */}
+      {/* ── Problems section ──────────────────────────────────────── */}
+      {/* Each problem is a real H3 + answer paragraph, not just a label.
+          This makes them featured-snippet candidates rather than keyword stuffing. */}
       {tool.problems.length > 0 && (
-        <section className="mb-10">
-          <h2 className="mb-4 text-lg font-semibold">{t.tool.problems}</h2>
-          <ul className="grid gap-2 sm:grid-cols-2">
+        <section className="mb-12">
+          <h2 className="mb-6 text-xl font-semibold">{t.tool.problems}</h2>
+          <div className="space-y-6">
             {tool.problems.map(problem => (
-              <li
+              <div
                 key={problem}
-                className="flex items-start gap-2 rounded-lg border border-border/40 bg-muted/30 px-3 py-2.5 text-sm text-muted-foreground"
+                id={problem.toLowerCase().replace(/[^a-z0-9]+/g, "-")}
+                className="rounded-lg border border-border/40 bg-muted/20 p-4"
               >
-                <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-                {problem}
-              </li>
+                <h3 className="mb-2 font-medium text-foreground">{problem}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {getProblemAnswer(problem, tool)}
+                </p>
+              </div>
             ))}
-          </ul>
+          </div>
         </section>
       )}
 
@@ -102,7 +108,7 @@ export default function ToolLayout({
             {workflowBefore.map(t2 => (
               <Link
                 key={t2.slug}
-                href={`/tools/${t2.slug}`}
+                href={`${base}/tools/${t2.slug}`}
                 className="rounded-md border border-border/60 bg-card px-3 py-1.5 font-medium transition-colors hover:border-border hover:bg-muted"
               >
                 {t2.name}
@@ -120,7 +126,7 @@ export default function ToolLayout({
             {workflowAfter.map(t2 => (
               <Link
                 key={t2.slug}
-                href={`/tools/${t2.slug}`}
+                href={`${base}/tools/${t2.slug}`}
                 className="rounded-md border border-border/60 bg-card px-3 py-1.5 font-medium transition-colors hover:border-border hover:bg-muted"
               >
                 {t2.name}
@@ -187,7 +193,7 @@ export default function ToolLayout({
             {relatedTools.map(rt => (
               <Link
                 key={rt.slug}
-                href={`/tools/${rt.slug}`}
+                href={`${base}/tools/${rt.slug}`}
                 className="group flex items-center justify-between rounded-lg border border-border/60 bg-card p-4 text-sm font-medium transition-all hover:border-border hover:bg-muted/50 hover:shadow-sm"
               >
                 <span>{rt.name}</span>
@@ -199,4 +205,32 @@ export default function ToolLayout({
       )}
     </div>
   )
+}
+
+// ── Problem answer generator ──────────────────────────────────────────────────
+// Each "How to X" problem gets a short, direct answer derived from the tool's
+// existing content. This turns keyword labels into genuine micro-answers that
+// can rank for featured snippets.
+function getProblemAnswer(problem: string, tool: ToolMeta): string {
+  // Try to find a relevant sentence from the tool's existing content
+  const searchIn = [
+    tool.content.intro,
+    tool.content.usage,
+    tool.content.useCases,
+    ...tool.content.faq.map(f => f.a),
+  ].join(" ")
+
+  // Extract the most relevant sentence (contains the most problem keywords)
+  const problemWords = problem.toLowerCase().replace(/^how to\s+/i, "").split(/\s+/)
+  const sentences    = searchIn.match(/[^.!?]+[.!?]+/g) ?? []
+
+  let bestSentence  = ""
+  let bestScore     = 0
+  for (const sentence of sentences) {
+    const lower = sentence.toLowerCase()
+    const score = problemWords.filter(w => w.length > 3 && lower.includes(w)).length
+    if (score > bestScore) { bestScore = score; bestSentence = sentence.trim() }
+  }
+
+  return bestSentence || `Use ${tool.name} to ${problem.replace(/^how to\s+/i, "").toLowerCase()}.`
 }

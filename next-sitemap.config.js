@@ -1,64 +1,64 @@
+// next-sitemap.config.js
+//
+// FIX: next-sitemap runs postbuild in CJS mode and cannot require() TypeScript files.
+// Solution: scripts/build-sitemap-data.mjs runs BEFORE next-sitemap and writes
+// public/sitemap-data.json with the slug lists. This file reads pure JSON.
+
+const { readFileSync } = require("fs")
+const { resolve }      = require("path")
+
+// Read the pre-generated slug data (produced by scripts/build-sitemap-data.mjs)
+let sitemapData = { toolSlugs: [], guideSlugs: [] }
+try {
+  const raw = readFileSync(resolve(__dirname, "public/sitemap-data.json"), "utf-8")
+  sitemapData = JSON.parse(raw)
+} catch {
+  console.warn("[next-sitemap] Warning: public/sitemap-data.json not found. Run scripts/build-sitemap-data.mjs first.")
+}
+
+const { toolSlugs, guideSlugs } = sitemapData
+const NON_DEFAULT_LOCALES = ["ja", "zh"]
+
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://aistacker.dev",
+  siteUrl:           process.env.NEXT_PUBLIC_SITE_URL || "https://aistacker.dev",
   generateRobotsTxt: true,
-  sitemapSize:  7000,
-  changefreq:   "weekly",
-  // Default priority — overridden per-path below
-  priority:     0.6,
-  exclude: [
-    "/api/*",
-    "/ja/api/*",
-    "/zh/api/*",
-  ],
+  sitemapSize:       7000,
+  changefreq:        "weekly",
+  priority:          0.6,
+  exclude:           ["/api/*", "/ja/api/*", "/zh/api/*"],
 
-  // Per-path priority overrides
-  // Tool pages and guides get 0.8; homepage gets 1.0 (set by default in next-sitemap)
   transform: async (config, path) => {
-    // Homepage
-    if (path === "/") {
+    if (path === "/")
       return { loc: path, changefreq: "daily", priority: 1.0, lastmod: new Date().toISOString() }
-    }
-    // Tool pages — highest non-home priority
-    if (path.match(/^\/(?:ja\/|zh\/)?tools\/[^/]+$/)) {
-      return { loc: path, changefreq: "monthly", priority: 0.8, lastmod: new Date().toISOString() }
-    }
-    // Tool index
-    if (path.match(/^\/(?:ja\/|zh\/)?tools\/?$/)) {
+    if (path.match(/^\/(?:ja\/|zh\/)?tools\/?$/))
       return { loc: path, changefreq: "weekly", priority: 0.9, lastmod: new Date().toISOString() }
-    }
-    // Guide pages
-    if (path.match(/^\/(?:ja\/|zh\/)?guides\/[^/]+$/)) {
+    if (path.match(/^\/(?:ja\/|zh\/)?tools\/[^/]+$/))
+      return { loc: path, changefreq: "monthly", priority: 0.8, lastmod: new Date().toISOString() }
+    if (path.match(/^\/(?:ja\/|zh\/)?guides\/?$/))
+      return { loc: path, changefreq: "weekly", priority: 0.85, lastmod: new Date().toISOString() }
+    if (path.match(/^\/(?:ja\/|zh\/)?guides\/[^/]+$/))
       return { loc: path, changefreq: "monthly", priority: 0.75, lastmod: new Date().toISOString() }
-    }
-    // Default
     return { loc: path, changefreq: config.changefreq, priority: config.priority, lastmod: new Date().toISOString() }
   },
 
-  robotsTxtOptions: {
-    policies: [
-      { userAgent: "*", allow: "/" },
-    ],
-    additionalSitemaps: [],
-  },
-
-  // Additional pages next-sitemap might not auto-discover
   additionalPaths: async (config) => {
-    const { tools }  = require("./data/tools")
-    const { guides } = require("./data/guides")
-    const locales    = ["ja", "zh"]
-    const extra      = []
-
-    // Add locale-prefixed tool pages
-    for (const locale of locales) {
-      for (const tool of tools) {
-        extra.push(await config.transform(config, `/${locale}/tools/${tool.slug}`))
+    const extra = []
+    for (const locale of NON_DEFAULT_LOCALES) {
+      extra.push(await config.transform(config, `/${locale}`))
+      extra.push(await config.transform(config, `/${locale}/tools`))
+      extra.push(await config.transform(config, `/${locale}/guides`))
+      for (const slug of toolSlugs) {
+        extra.push(await config.transform(config, `/${locale}/tools/${slug}`))
       }
-      for (const guide of guides) {
-        extra.push(await config.transform(config, `/${locale}/guides/${guide.slug}`))
+      for (const slug of guideSlugs) {
+        extra.push(await config.transform(config, `/${locale}/guides/${slug}`))
       }
     }
-
     return extra
+  },
+
+  robotsTxtOptions: {
+    policies: [{ userAgent: "*", allow: "/" }],
   },
 }
