@@ -6,8 +6,10 @@ import { Layers }         from "lucide-react"
 import { cn }             from "@/lib/utils"
 import { ThemeToggle }    from "@/components/ThemeToggle"
 import { localeNames, type Locale } from "@/lib/i18n/config"
+import { LOCALE_COOKIE }  from "@/middleware"
 
-// Detect current locale and base path from pathname
+// ── Locale detection ─────────────────────────────────────────────────────────
+
 function useLocaleAndBase(): { locale: Locale; base: string } {
   const pathname = usePathname()
   const seg      = pathname.split("/")[1]
@@ -17,23 +19,36 @@ function useLocaleAndBase(): { locale: Locale; base: string } {
   return { locale: "en", base: "" }
 }
 
+// ── Locale switcher ───────────────────────────────────────────────────────────
+
+function switchLocale(next: Locale, currentLocale: Locale, pathname: string): string {
+  const currentPrefix = currentLocale === "en" ? "" : `/${currentLocale}`
+  const nextPrefix    = next          === "en" ? "" : `/${next}`
+  const rest          = pathname.startsWith(currentPrefix)
+    ? pathname.slice(currentPrefix.length)
+    : "/"
+  return `${nextPrefix}${rest || "/"}`
+}
+
+// Writes the locale cookie so middleware respects the user's explicit choice.
+// This is the key fix: without the cookie, middleware re-detects from
+// Accept-Language on every request and overrides the user's EN selection.
+function setLocaleCookie(locale: Locale): void {
+  // Max-age = 1 year; SameSite=Lax is safe for navigation
+  document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=31536000; SameSite=Lax`
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
+
 export function SiteHeader() {
-  const pathname            = usePathname()
-  const { locale, base }   = useLocaleAndBase()
+  const pathname          = usePathname()
+  const { locale, base } = useLocaleAndBase()
 
   const NAV = [
-    { href: `${base}/`,      label: "Home",      exact: true },
-    { href: `${base}/tools`, label: "All Tools", exact: false },
-    { href: `${base}/guides`, label: "Guides",   exact: false },
+    { href: `${base}/`,       label: "Home",      exact: true  },
+    { href: `${base}/tools`,  label: "Tools", exact: false },
+    { href: `${base}/guides`, label: "Guides",    exact: false },
   ]
-
-  // Language switcher: swap the locale prefix, keep the rest of the path
-  function switchLocale(next: Locale): string {
-    const current = locale === "en" ? "" : `/${locale}`
-    const nextPfx = next    === "en" ? "" : `/${next}`
-    const rest    = pathname.startsWith(current) ? pathname.slice(current.length) : "/"
-    return `${nextPfx}${rest || "/"}`
-  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/90 backdrop-blur-sm">
@@ -48,7 +63,9 @@ export function SiteHeader() {
         {/* Nav */}
         <nav className="flex items-center gap-1">
           {NAV.map(({ href, label, exact }) => {
-            const active = exact ? pathname === href : pathname.startsWith(href) && href !== `${base}/`
+            const active = exact
+              ? pathname === href
+              : pathname.startsWith(href) && href !== `${base}/`
             return (
               <Link
                 key={href}
@@ -66,15 +83,16 @@ export function SiteHeader() {
           })}
         </nav>
 
-        {/* Right: language switcher + theme toggle */}
+        {/* Right: language switcher + theme */}
         <div className="ml-auto flex items-center gap-1">
 
-          {/* Language switcher */}
+          {/* Language switcher — sets cookie before navigating */}
           <div className="flex items-center rounded-md border border-border/60 bg-muted/40 p-0.5">
             {(Object.keys(localeNames) as Locale[]).map(l => (
               <Link
                 key={l}
-                href={switchLocale(l)}
+                href={switchLocale(l, locale, pathname)}
+                onClick={() => setLocaleCookie(l)}
                 className={cn(
                   "rounded px-2 py-0.5 text-xs font-medium transition-colors",
                   locale === l
@@ -82,6 +100,7 @@ export function SiteHeader() {
                     : "text-muted-foreground hover:text-foreground"
                 )}
                 aria-label={`Switch to ${localeNames[l]}`}
+                aria-current={locale === l ? "true" : undefined}
               >
                 {l.toUpperCase()}
               </Link>

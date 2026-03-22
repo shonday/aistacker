@@ -1,4 +1,4 @@
-// data/tools/index.ts
+// data/tools/index.ts — updated with Wave 1 tools
 // ★ Public API — import from "@/data/tools" still works unchanged.
 //
 // File layout:
@@ -18,7 +18,6 @@
 //   3. Re-run build — index.ts auto-merges all arrays
 //
 // This keeps each category file under ~100 lines regardless of total tool count.
-
 export * from "./types"
 
 import { formatterTools }  from "./formatter"
@@ -26,15 +25,16 @@ import { encoderTools }    from "./encoder"
 import { generatorTools }  from "./generator"
 import { testerTools }     from "./tester"
 import { converterTools }  from "./converter"
+import { wave1Tools }      from "./new-wave1"
 import type { ToolMeta, ToolCategory, ToolSubcategory } from "./types"
 
-// ── Master list (all categories merged) ──────────────────────────────────────
 export const tools: ToolMeta[] = [
   ...formatterTools,
   ...encoderTools,
   ...generatorTools,
   ...testerTools,
   ...converterTools,
+  ...wave1Tools,
 ]
 
 // ── Utility helpers ───────────────────────────────────────────────────────────

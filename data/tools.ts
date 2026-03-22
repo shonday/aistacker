@@ -867,8 +867,70 @@ export const tools: ToolMeta[] = [
       }
     }
   }
-}
-
+},
+{
+    slug:        "hash-generator",
+    name:        "Hash Generator",
+    description: "Generate MD5, SHA-1, SHA-256, and SHA-512 hashes from any text — updates live as you type.",
+    component:   "HashGenerator",
+    category:    "crypto",
+    subcategory: "hash",
+    tags: [
+      "hash", "md5", "sha-256", "sha-512", "sha-1",
+      "checksum", "crypto", "digest", "hashing",
+      "generate hash online", "md5 hash generator", "sha256 online",
+    ],
+    status:   "new",
+    featured: false,
+    addedAt:  "2025-03-20",
+    seo: {
+      title:       "Hash Generator Online - MD5, SHA-1, SHA-256, SHA-512",
+      description: "Generate MD5, SHA-1, SHA-256, and SHA-512 hashes from any text. All four hashes shown simultaneously, live update as you type.",
+    },
+    content: {
+      intro:    "Cryptographic hash functions produce a fixed-length digest from any input. This tool computes MD5, SHA-1, SHA-256, and SHA-512 hashes simultaneously, updating live as you type using the browser's built-in Web Crypto API.",
+      usage:    "Type or paste your text in the input field. All four hash values update immediately. Click Copy next to any hash to copy just that value, or Copy All to copy all four.",
+      example:  "Input: Hello, World!\n\nMD5:    65a8e27d8879283831b664bd8b7f0ad4\nSHA-1:  0a0a9f2a6772942557ab5355d76af442f8f65e01\nSHA-256:dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986d\nSHA-512:374d794a95cdcfd8b35993185fef9ba368f160d8daf432d08ba9f1ed1e5abe6c...",
+      useCases: "1. Verifying file integrity by comparing checksums.\n2. Generating content-addressable identifiers for caching.\n3. Creating test data with known hash values.\n4. Understanding which hashing algorithm a system is using.",
+      faq: [
+        { q: "Which algorithm should I use?",                  a: "Use SHA-256 or SHA-512 for new applications. MD5 and SHA-1 are cryptographically broken — avoid them for security purposes, though they're still useful for checksums." },
+        { q: "Is hashing the same as encryption?",             a: "No. Hashing is one-way — you cannot reverse a hash back to the original input. Encryption is two-way with a key." },
+        { q: "Why does the same input always produce the same hash?", a: "Hash functions are deterministic. This is the property that makes them useful for checksums and content addressing." },
+      ],
+    },
+    problems: [
+      "How to generate an MD5 hash online",
+      "How to generate a SHA-256 hash",
+      "How to verify file integrity with a checksum",
+      "What is the difference between MD5 and SHA-256",
+      "How to hash a string in the browser",
+      "How to generate all hash types at once",
+    ],
+    workflow: { before: [], after: [] },
+    searchIntents: {
+      informational: ["what is md5 hash", "sha256 vs sha512", "how does hashing work"],
+      navigational:  ["md5 hash generator online", "sha256 hash generator", "online hash calculator"],
+      transactional: ["generate md5 hash free", "sha256 hash string online", "hash text online"],
+    },
+    i18n: {
+      ja: {
+        name:        "ハッシュ生成ツール",
+        description: "MD5・SHA-1・SHA-256・SHA-512のハッシュ値をリアルタイムで生成します。",
+        seo: {
+          title:       "ハッシュ生成ツール - MD5・SHA-256・SHA-512 | AIStacker",
+          description: "テキストのMD5・SHA-1・SHA-256・SHA-512ハッシュを同時生成。入力と同時にリアルタイム更新。",
+        },
+      },
+      zh: {
+        name:        "哈希生成器",
+        description: "实时生成 MD5、SHA-1、SHA-256 和 SHA-512 哈希值，输入即更新。",
+        seo: {
+          title:       "哈希生成器 - MD5/SHA-256/SHA-512 在线计算 | AIStacker",
+          description: "同时生成 MD5、SHA-1、SHA-256 和 SHA-512 哈希值，实时更新。使用浏览器 Web Crypto API，数据不会上传。",
+        },
+      },
+    },
+  },
 
 
 
