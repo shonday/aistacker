@@ -11,6 +11,7 @@ interface ToolLayoutProps {
   messages:       Messages
   toolComponent:  React.ReactNode
   relatedTools:   ToolMeta[]
+  locale?: string
 }
 
 export default function ToolLayout({
@@ -67,7 +68,7 @@ export default function ToolLayout({
       {/* ── Tool component ────────────────────────────────────────── */}
       <section className="mb-12 rounded-xl border border-border/60 bg-card p-5 shadow-sm sm:p-8">
         {toolComponent ?? (
-          <div className="flex min-h-[200px] items-center justify-center text-muted-foreground">
+          <div className="flex in-h-50 items-center justify-center text-muted-foreground">
             Component coming soon.
           </div>
         )}
