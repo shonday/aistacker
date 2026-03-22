@@ -1,27 +1,27 @@
+// data/tools.ts — Central Tool Registry
+// v2: adds problems[], workflow{}, searchIntents{}, i18n{} fields
+// These power SEO breadth, smart recommendations, and multilingual support.
+
 // ─────────────────────────────────────────────────────────────────────────────
-// data/tools.ts  —  Central Tool Registry
-//
-// ONLY file you touch when adding a new tool:
-//   1. Add an entry here
-//   2. Drop the .tsx in components/tools/
-//   Done. Routing, SEO, sitemap, search, related-tools are all automatic.
+// Types
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type ToolCategory =
-  | "formatter"
-  | "encoder"
-  | "generator"
-  | "tester"
-  | "converter"
-  | "japanese"
-  | "text"
-  | "number"
-  | "color"
-  | "image"
-  | "network"
-  | "crypto"
+  | "formatter" | "encoder" | "generator" | "tester"
+  | "converter" | "japanese" | "text" | "number"
+  | "color" | "image" | "network" | "crypto"
+
+export type ToolSubcategory =
+  | "json" | "yaml" | "xml" | "csv"
+  | "base64" | "url" | "html" | "jwt"
+  | "uuid" | "hash" | "password"
+  | "regex" | "diff" | "lint"
+  | "timestamp" | "timezone" | "color-space"
+  | "markdown" | "unicode" | "word-count"
+  | "number-base" | "ip" | "dns"
 
 export type ToolStatus = "stable" | "beta" | "new"
+export type Locale = "en" | "ja" | "zh"
 
 export interface ToolFaq {
   q: string
@@ -29,325 +29,604 @@ export interface ToolFaq {
 }
 
 export interface ToolContent {
-  intro: string
-  usage: string
-  example: string
+  intro:    string
+  usage:    string
+  example:  string
   useCases: string
-  faq: ToolFaq[]
+  faq:      ToolFaq[]
+}
+
+export interface ToolWorkflow {
+  // slugs of tools commonly used BEFORE this one
+  before: string[]
+  // slugs of tools commonly used AFTER this one
+  after:  string[]
+}
+
+export interface ToolSearchIntents {
+  // "what is json" — educational queries
+  informational: string[]
+  // "json formatter online" — tool-finding queries
+  navigational:  string[]
+  // "format json free" — task-completion queries (highest conversion)
+  transactional: string[]
+}
+
+export interface ToolI18nOverride {
+  name?:        string
+  description?: string
+  seo?:         { title: string; description: string }
+  content?:     Partial<ToolContent>
 }
 
 export interface ToolMeta {
-  slug: string          // kebab-case → URL: /tools/{slug}
-  name: string          // Display name
-  description: string   // Short description for cards + meta (≤160 chars)
-  component: string     // PascalCase filename in components/tools/ (no .tsx)
-  category: ToolCategory
-  tags: string[]        // Drives fuse.js search + tag cloud
-  status: ToolStatus
-  featured?: boolean    // Shown on homepage hero grid
-  addedAt: string       // ISO "YYYY-MM-DD" — drives "New" badge (30 days)
-  content: ToolContent  // Long-form SEO copy rendered below the tool
+  slug:        string       // kebab-case → URL /tools/{slug}
+  name:        string
+  description: string       // ≤160 chars, used in cards and meta
+  component:   string       // PascalCase, maps to components/tools/{component}.tsx
+  category:    ToolCategory
+  subcategory: ToolSubcategory
+  tags:        string[]     // fuse.js search + tag cloud (include alias phrases)
+  status:      ToolStatus
+  featured?:   boolean
+  addedAt:     string       // ISO "YYYY-MM-DD"
   seo: {
-    title: string       // Full <title> tag
-    description: string // <meta description>
+    title:       string
+    description: string
   }
-  // Future FastAPI hook: set this when a tool needs server-side processing.
-  // The frontend calls lib/api.ts → POST ${NEXT_PUBLIC_API_BASE}{apiEndpoint}
-  apiEndpoint?: string  // e.g. "/api/tools/pdf-compress"
+  content:     ToolContent
+
+  // ── v2 additions ──────────────────────────────────────────────────────────
+
+  // Specific user problems this tool solves — drives H2/H3 SEO breadth
+  // Each string becomes a linkable heading on the tool page
+  problems: string[]
+
+  // Tool graph — powers "Typical Workflow" section + smart recommendations
+  workflow: ToolWorkflow
+
+  // Search intent keywords — used by sitemap priority and internal search
+  searchIntents: ToolSearchIntents
+
+  // Future FastAPI endpoint (dormant until a tool needs server-side processing)
+  apiEndpoint?: string
+
+  // Per-locale content overrides (UI strings come from lib/i18n/messages/)
+  i18n?: Partial<Record<"ja" | "zh", ToolI18nOverride>>
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Registry
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const tools: ToolMeta[] = [
   {
-    slug: "json-formatter",
-    name: "JSON Formatter",
+    slug:        "json-formatter",
+    name:        "JSON Formatter",
     description: "Beautify, minify, validate and sort JSON instantly in your browser.",
-    component: "JsonFormatter",
-    category: "formatter",
-    tags: ["json", "formatter", "beautify", "minify", "validator", "pretty-print", "sort-keys"],
-    status: "stable",
+    component:   "JsonFormatter",
+    category:    "formatter",
+    subcategory: "json",
+    tags: [
+      "json", "formatter", "beautify", "minify", "validator", "pretty-print",
+      "sort-keys", "make json readable", "prettify json", "json lint",
+      "format api response", "jsn formater",
+    ],
+    status:   "stable",
     featured: true,
-    addedAt: "2025-01-01",
+    addedAt:  "2025-01-01",
     seo: {
-      title: "Free JSON Formatter Online - Beautify & Prettify JSON",
-      description: "Fastest online JSON formatter with syntax validation, minify and key-sorting. 100% private — all processing happens in your browser.",
+      title:       "Free JSON Formatter Online - Beautify, Minify & Validate JSON",
+      description: "Paste messy JSON and get it instantly beautified, minified, validated with error highlighting. 100% private — runs in your browser.",
     },
     content: {
-      intro: "JSON Formatter is an essential utility for developers, data analysts, and system administrators who work with JavaScript Object Notation. APIs often return minified JSON to save bandwidth, making it nearly impossible to read or debug. This tool transforms dense strings into a human-readable, hierarchical structure with proper indentation and syntax highlighting.",
-      usage: "Paste your raw, minified, or messy JSON into the left panel. Choose Pretty or Minify mode, optionally enable key sorting, then click Format JSON (or press ⌘/Ctrl+Enter). The validated output appears on the right, ready to copy.",
-      example: '// Input:\n{"id":1,"name":"AIStacker"}\n\n// Pretty output:\n{\n  "id": 1,\n  "name": "AIStacker"\n}',
-      useCases: "1. Debugging REST API responses.\n2. Formatting config files (package.json, tsconfig.json).\n3. Validating JSON syntax before committing.\n4. Minifying JSON to reduce payload size.\n5. Sorting keys alphabetically for diff readability.",
+      intro:    "JSON Formatter transforms minified or messy JSON into a clean, indented structure with syntax validation. APIs return compressed JSON to save bandwidth — this tool makes it instantly human-readable without leaving your browser.",
+      usage:    "Paste your JSON into the left panel. Choose Pretty or Minify mode, optionally sort keys alphabetically, then press Format (or Ctrl+Enter). Copy the result with one click.",
+      example:  'Input:  {"id":1,"name":"AIStacker","active":true}\n\nPretty output:\n{\n  "id": 1,\n  "name": "AIStacker",\n  "active": true\n}\n\nMinify output:\n{"id":1,"name":"AIStacker","active":true}',
+      useCases: "1. Debugging REST API responses during development.\n2. Formatting config files (package.json, tsconfig.json, appsettings.json).\n3. Validating JSON before submitting to an API.\n4. Minifying JSON payloads to reduce HTTP request size.\n5. Sorting keys alphabetically before committing to version control.",
       faq: [
-        { q: "Is my JSON data secure?", a: "Yes. All processing happens entirely in your browser using JavaScript. No data is ever sent to a server." },
-        { q: "Can it handle invalid JSON?", a: "Yes — a clear parse error message is shown inline so you can pinpoint the problem immediately." },
-        { q: "Does it support JSON5 or JavaScript objects?", a: "The parser uses the standard JSON.parse(), so JSON5 and unquoted keys are not supported. Convert to standard JSON first." },
+        { q: "Is my JSON data sent to a server?",        a: "No. All processing runs entirely in your browser using JavaScript. Nothing is transmitted." },
+        { q: "Can it handle invalid or broken JSON?",    a: "Yes. A clear parse error with the line number is shown inline so you can fix the problem immediately." },
+        { q: "Does it support JSON5 or comments in JSON?", a: "The parser uses the standard JSON.parse() specification. JSON5 and comments are not supported — remove them first." },
+        { q: "What is the maximum file size it can handle?", a: "Practically limited by your browser's memory. Files up to 10MB format smoothly in most modern browsers." },
       ],
     },
+    problems: [
+      "How to format JSON from an API response",
+      "How to minify JSON to reduce payload size",
+      "How to validate JSON syntax online",
+      "How to sort JSON keys alphabetically",
+      "How to read minified JSON",
+      "How to fix a JSON parse error",
+    ],
+    workflow: {
+      before: ["url-decode", "base64-encode"],
+      after:  ["base64-encode", "url-encode"],
+    },
+    searchIntents: {
+      informational: ["what is json", "what is json formatting", "json syntax rules"],
+      navigational:  ["json formatter online", "json beautifier", "json prettifier free"],
+      transactional: ["format json free", "json formatter no install", "online json validator"],
+    },
+    i18n: {
+      ja: {
+        name:        "JSON フォーマッター",
+        description: "JSONをブラウザ上で瞬時に整形・圧縮・検証できます。",
+        seo: {
+          title:       "JSONフォーマッター - 無料オンラインツール | AIStacker",
+          description: "貼り付けるだけでJSONを整形・圧縮・バリデーション。完全ブラウザ処理でデータは外部に送信されません。",
+        },
+      },
+      zh: {
+        name:        "JSON 格式化工具",
+        description: "在浏览器中即时美化、压缩和验证 JSON，完全本地处理。",
+        seo: {
+          title:       "JSON 格式化工具 - 免费在线 | AIStacker",
+          description: "粘贴杂乱的 JSON 即可立即美化、压缩并验证语法。完全在浏览器本地处理，数据不会上传。",
+        },
+      },
+    },
   },
+
   {
-    slug: "base64-encode",
-    name: "Base64 Encoder / Decoder",
+    slug:        "base64-encode",
+    name:        "Base64 Encoder / Decoder",
     description: "Encode text or files to Base64, or decode Base64 strings back to plain text.",
-    component: "Base64Encoder",
-    category: "encoder",
-    tags: ["base64", "encoder", "decoder", "binary", "encoding", "decode", "encode"],
-    status: "stable",
+    component:   "Base64Encoder",
+    category:    "encoder",
+    subcategory: "base64",
+    tags: [
+      "base64", "encoder", "decoder", "encode", "decode",
+      "binary to text", "base 64", "base64 decode online",
+      "base64 image", "data uri", "atob btoa",
+    ],
+    status:   "stable",
     featured: true,
-    addedAt: "2025-01-01",
+    addedAt:  "2025-01-01",
     seo: {
-      title: "Base64 Encode & Decode Online - Secure & Fast",
-      description: "Convert strings to Base64 format or decode them back. Supports Unicode, handles files, runs entirely in your browser.",
+      title:       "Base64 Encoder & Decoder Online - Free, Fast, Private",
+      description: "Encode text to Base64 or decode Base64 strings instantly. Supports Unicode, emoji, and binary data. Runs entirely in your browser.",
     },
     content: {
-      intro: "Base64 encoding converts binary data into an ASCII string using 64 printable characters. It is widely used when binary data needs to be stored and transferred over media designed for text — such as embedding images in CSS, passing tokens in HTTP headers, or encoding email attachments.",
-      usage: "Select Encode or Decode mode, paste your input, and click the action button. For encoding, any UTF-8 text is accepted. For decoding, provide a valid Base64 string.",
-      example: "// Plain text → Base64\nHello, World!  →  SGVsbG8sIFdvcmxkIQ==\n\n// Base64 → Plain text\nU0VDUkVU  →  SECRET",
-      useCases: "1. Encoding binary data for JSON APIs.\n2. Embedding small images as data URIs in CSS/HTML.\n3. Passing credentials in HTTP Basic Auth headers.\n4. Decoding JWT token payloads for inspection.",
+      intro:    "Base64 converts binary data into 64 printable ASCII characters, making it safe to transmit through text-only channels like HTTP headers, JSON, and email. This tool encodes and decodes Base64 instantly in your browser.",
+      usage:    "Select Encode or Decode mode, paste your input, and click the action button. For encoding, any UTF-8 text including Unicode characters is accepted. For decoding, provide a valid Base64 string.",
+      example:  "Encode:\n  Input:  Hello, World!\n  Output: SGVsbG8sIFdvcmxkIQ==\n\nDecode:\n  Input:  U0VDUkVU\n  Output: SECRET",
+      useCases: "1. Decoding JWT token payloads to inspect claims.\n2. Embedding small images as data URIs in HTML or CSS.\n3. Encoding credentials for HTTP Basic Auth headers.\n4. Passing binary data through JSON APIs.\n5. Decoding Base64-encoded environment variables.",
       faq: [
-        { q: "Is Base64 the same as encryption?", a: "No. Base64 is an encoding scheme, not encryption. It is trivially reversible and provides no security — use it for format compatibility, not secrecy." },
-        { q: "Does it support Unicode / emoji?", a: "Yes. The encoder properly handles full Unicode including CJK characters and emoji by using TextEncoder internally." },
+        { q: "Is Base64 the same as encryption?",  a: "No. Base64 is an encoding scheme — it is trivially reversible and provides zero security. Use it for format compatibility, not secrecy." },
+        { q: "Does it support Unicode and emoji?",  a: "Yes. The encoder handles full Unicode by using TextEncoder internally before converting to Base64." },
+        { q: "Why does my decoded output look garbled?", a: "The original data may not have been text — it might be a binary file (image, PDF). Base64 is not limited to text." },
       ],
     },
+    problems: [
+      "How to decode a Base64 string online",
+      "How to encode text to Base64",
+      "How to decode a JWT token payload",
+      "How to convert image to Base64 data URI",
+      "How to decode Base64 environment variables",
+      "What does a Base64 string look like",
+    ],
+    workflow: {
+      before: ["url-decode"],
+      after:  ["json-formatter", "url-decode"],
+    },
+    searchIntents: {
+      informational: ["what is base64", "how does base64 encoding work", "base64 vs hex"],
+      navigational:  ["base64 decoder online", "base64 encoder free", "online base64 converter"],
+      transactional: ["decode base64 string", "encode text base64", "base64 decode free online"],
+    },
+    i18n: {
+      ja: {
+        name:        "Base64 エンコーダー / デコーダー",
+        description: "テキストをBase64にエンコード、またはBase64文字列をデコードします。",
+        seo: {
+          title:       "Base64 エンコード・デコード - 無料オンライン | AIStacker",
+          description: "テキストをBase64に変換、またはBase64を元のテキストに戻す。Unicode・絵文字対応。完全ブラウザ処理。",
+        },
+      },
+      zh: {
+        name:        "Base64 编码 / 解码",
+        description: "将文本编码为 Base64 或将 Base64 字符串解码为原文。",
+        seo: {
+          title:       "Base64 编码解码 - 免费在线工具 | AIStacker",
+          description: "在线 Base64 编码和解码，支持 Unicode 和中文。完全在浏览器本地处理，数据不会上传。",
+        },
+      },
+    },
   },
+
   {
-    slug: "uuid-generator",
-    name: "UUID Generator",
+    slug:        "uuid-generator",
+    name:        "UUID Generator",
     description: "Generate cryptographically secure UUID v4 identifiers in bulk.",
-    component: "UUIDGenerator",
-    category: "generator",
-    tags: ["uuid", "guid", "generator", "random", "unique-id", "v4", "crypto"],
-    status: "stable",
+    component:   "UUIDGenerator",
+    category:    "generator",
+    subcategory: "uuid",
+    tags: [
+      "uuid", "guid", "generator", "random", "unique-id", "v4",
+      "crypto", "uuid v4", "generate guid", "random id generator",
+      "universally unique identifier", "primary key generator",
+    ],
+    status:   "stable",
     featured: true,
-    addedAt: "2025-01-01",
+    addedAt:  "2025-01-01",
     seo: {
-      title: "Online UUID Generator - Create Random V4 UUIDs in Bulk",
-      description: "Generate cryptographically secure v4 UUIDs (GUIDs) instantly. Bulk generation, copy all, history — runs entirely in your browser.",
+      title:       "UUID Generator Online - Bulk UUID v4, Cryptographically Secure",
+      description: "Generate single or bulk UUID v4 identifiers using the browser's CSPRNG. Copy all with one click. Runs locally, no data sent.",
     },
     content: {
-      intro: "A Universally Unique Identifier (UUID) is a 128-bit label standardised as RFC 4122. Version 4 UUIDs are randomly generated using a cryptographically secure random number generator, giving them an astronomically low collision probability — roughly 1 in 5.3×10³⁶ per pair.",
-      usage: "Click Generate to produce a single UUID, or set a count and use Bulk Generate to create up to 100 at once. Each UUID is shown in standard hyphenated format and can be copied individually or all at once.",
-      example: "Single: 550e8400-e29b-41d4-a716-446655440000\nBulk (3):\n  f47ac10b-58cc-4372-a567-0e02b2c3d479\n  6ba7b810-9dad-11d1-80b4-00c04fd430c8\n  6ba7b811-9dad-11d1-80b4-00c04fd430c8",
-      useCases: "1. Primary keys in SQL and NoSQL databases.\n2. Unique session and transaction identifiers.\n3. Idempotency keys for API requests.\n4. Filenames for uploaded assets.",
+      intro:    "UUID v4 generates 128-bit identifiers using cryptographically secure random numbers, giving a collision probability of 1 in 5.3×10³⁶ per pair. This tool generates single or bulk UUIDs instantly using your browser's built-in crypto API.",
+      usage:    "Click Generate for a single UUID, or set a quantity (up to 100) and click Bulk Generate. Copy individual UUIDs or all at once. The Recent History panel keeps your last 10 generated IDs.",
+      example:  "Single:  f47ac10b-58cc-4372-a567-0e02b2c3d479\n\nBulk (3):\n  3d721da8-8e4b-4f1a-b2e9-c1d3f5a7e291\n  9b2c4e6f-1a3b-5c7d-8e9f-0a1b2c3d4e5f\n  1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+      useCases: "1. Generating primary keys for SQL and NoSQL database records.\n2. Creating idempotency keys for API requests to prevent duplicate processing.\n3. Unique filenames for user-uploaded assets in object storage.\n4. Session IDs and correlation IDs for distributed system tracing.\n5. Generating test fixtures with unique identifiers.",
       faq: [
-        { q: "How random are these UUIDs?", a: "They use window.crypto.randomUUID(), which is the browser's cryptographically secure pseudorandom number generator (CSPRNG) — the same source used for TLS." },
-        { q: "Are generated UUIDs stored anywhere?", a: "No. Generation happens entirely client-side. Nothing is transmitted or logged." },
+        { q: "How random are these UUIDs?",           a: "They use window.crypto.randomUUID() — the browser's CSPRNG, the same source used for TLS and cryptographic key generation." },
+        { q: "Is UUID v4 better than UUID v1?",       a: "For most use cases yes — v4 is purely random and doesn't leak machine info or timestamp. Use v1 only when sortable time-ordering is required." },
+        { q: "Can two generated UUIDs ever be equal?", a: "Theoretically yes, but the probability is about 1 in 10³⁶. In practice, you will never encounter a collision." },
       ],
     },
+    problems: [
+      "How to generate a UUID online",
+      "How to create a GUID for a database primary key",
+      "How to generate multiple UUIDs at once",
+      "How to create a random unique ID",
+      "Difference between UUID v1 and UUID v4",
+    ],
+    workflow: {
+      before: [],
+      after:  ["base64-encode"],
+    },
+    searchIntents: {
+      informational: ["what is a uuid", "uuid v4 format", "uuid vs guid difference"],
+      navigational:  ["uuid generator online", "guid generator free", "random uuid"],
+      transactional: ["generate uuid v4", "create guid online", "bulk uuid generator"],
+    },
+    i18n: {
+      ja: {
+        name:        "UUID ジェネレーター",
+        description: "暗号学的に安全なUUID v4を一括生成します。",
+        seo: {
+          title:       "UUID ジェネレーター - 無料オンライン | AIStacker",
+          description: "UUID v4をブラウザのCryptoAPIで生成。一括生成・一括コピー対応。データの送信なし。",
+        },
+      },
+      zh: {
+        name:        "UUID 生成器",
+        description: "批量生成加密安全的 UUID v4 标识符。",
+        seo: {
+          title:       "UUID 生成器 - 免费在线批量生成 | AIStacker",
+          description: "使用浏览器加密 API 生成 UUID v4，支持批量生成和一键复制。完全本地处理。",
+        },
+      },
+    },
   },
+
   {
-    slug: "regex-tester",
-    name: "Regex Tester",
-    description: "Test regular expressions with real-time match highlighting and group capture breakdown.",
-    component: "RegexTester",
-    category: "tester",
-    tags: ["regex", "regular-expression", "tester", "match", "pattern", "javascript", "flags", "groups"],
-    status: "stable",
+    slug:        "regex-tester",
+    name:        "Regex Tester",
+    description: "Test regular expressions with real-time highlighting, flag toggles, and group capture breakdown.",
+    component:   "RegexTester",
+    category:    "tester",
+    subcategory: "regex",
+    tags: [
+      "regex", "regular expression", "tester", "matcher", "debugger",
+      "javascript regex", "flags", "capture groups", "named groups",
+      "regex online", "regexp tester", "regex validator",
+    ],
+    status:   "stable",
     featured: true,
-    addedAt: "2025-01-01",
+    addedAt:  "2025-01-01",
     seo: {
-      title: "Online Regex Tester - Real-time Regular Expression Debugger",
-      description: "Write and test regular expressions with instant match highlighting, flag toggles, group capture breakdown. Uses the JavaScript RegExp engine.",
+      title:       "Regex Tester Online - Real-time Regex Debugger with Group Capture",
+      description: "Test JavaScript regular expressions with live match highlighting, g/i/m/s/u flag toggles, capture group breakdown, and match count.",
     },
     content: {
-      intro: "Regular expressions are patterns used to match character combinations in strings. This tester provides a real-time environment to write, validate, and debug patterns — with live match highlighting, flag toggles (g, i, m, s, u), and a capture group breakdown panel.",
-      usage: "Enter your pattern in the regex field. Toggle flags using the buttons (g for global, i for case-insensitive, m for multiline). Type or paste your test string — matches are highlighted instantly. The Groups panel shows each captured group by index and name.",
-      example: "Pattern: (\\w+)@(\\w+\\.\\w+)\nFlags: gi\nTest: Contact us at hello@aistacker.dev or support@example.com\nMatches: hello@aistacker.dev, support@example.com\nGroup 1: hello, support\nGroup 2: aistacker.dev, example.com",
-      useCases: "1. Validating email addresses, phone numbers, URLs.\n2. Extracting data from log files and API responses.\n3. Writing find-and-replace patterns for code editors.\n4. Learning and experimenting with JavaScript regex syntax.",
+      intro:    "Regex Tester provides a real-time environment to write and debug JavaScript regular expressions. Enter a pattern, toggle flags, type your test string — matches highlight instantly and capture groups are broken down by index and name.",
+      usage:    "Enter your pattern in the regex field. Toggle flags (g, i, m, s, u) using the buttons. Type or paste your test string. The Groups panel shows each capture group's value. Match count updates as you type.",
+      example:  "Pattern: (\\w+)@([\\w.]+)\nFlags:   gi\nTest:    Contact: hello@aistacker.dev or support@example.com\n\nMatches: 2\nGroup 1: hello, support\nGroup 2: aistacker.dev, example.com",
+      useCases: "1. Validating email, phone, and URL formats before writing code.\n2. Extracting structured data from server logs and API responses.\n3. Building find-and-replace patterns for code editors.\n4. Learning and experimenting with JavaScript regex syntax.\n5. Debugging regex that works in one language but not another.",
       faq: [
-        { q: "Which regex engine is used?", a: "The standard JavaScript RegExp engine, so patterns behave identically to what you'd use in Node.js or the browser." },
-        { q: "Why is my pattern crashing?", a: "Some patterns like (a+)+ can cause catastrophic backtracking. The tester catches RegExp errors gracefully and shows the error inline." },
+        { q: "Which regex engine is used?",          a: "The standard JavaScript RegExp engine — patterns behave identically to what you'd use in Node.js, Chrome DevTools, or any JS runtime." },
+        { q: "Why is my pattern causing the page to hang?", a: "Some patterns cause catastrophic backtracking (e.g., (a+)+). The tester catches RegExp errors but cannot prevent all infinite loops — if it hangs, refresh the page." },
+        { q: "How do I use named capture groups?",   a: "Use (?<name>pattern) syntax. Named groups appear in the Groups panel with their names alongside index-based groups." },
       ],
     },
+    problems: [
+      "How to test a regex pattern online",
+      "How to extract email addresses with regex",
+      "How to use capture groups in JavaScript",
+      "How to match multiple lines with regex",
+      "What does the g flag do in regex",
+      "How to use named capture groups",
+      "How to count regex matches",
+    ],
+    workflow: {
+      before: [],
+      after:  ["url-encode"],
+    },
+    searchIntents: {
+      informational: ["how does regex work", "regex flags explained", "what are capture groups regex"],
+      navigational:  ["regex tester online", "regex debugger", "javascript regex tester"],
+      transactional: ["test regex online free", "regex validator javascript", "online regex matcher"],
+    },
+    i18n: {
+      ja: {
+        name:        "正規表現テスター",
+        description: "リアルタイムマッチングでJavaScriptの正規表現をテスト・デバッグ。",
+        seo: {
+          title:       "正規表現テスター - リアルタイムデバッガー | AIStacker",
+          description: "JavaScriptの正規表現をオンラインでテスト。フラグ切替・キャプチャグループ・マッチ数表示に対応。",
+        },
+      },
+      zh: {
+        name:        "正则表达式测试器",
+        description: "实时测试 JavaScript 正则表达式，支持标志切换和捕获组分解。",
+        seo: {
+          title:       "正则表达式测试器 - 实时在线调试 | AIStacker",
+          description: "在线测试 JavaScript 正则表达式，支持 g/i/m/s/u 标志、捕获组和匹配计数。",
+        },
+      },
+    },
   },
+
   {
-    slug: "timestamp-converter",
-    name: "Timestamp Converter",
+    slug:        "timestamp-converter",
+    name:        "Timestamp Converter",
     description: "Convert between Unix timestamps and human-readable dates across any timezone.",
-    component: "TimestampConverter",
-    category: "converter",
-    tags: ["timestamp", "unix", "date", "converter", "epoch", "timezone", "utc", "iso8601"],
-    status: "stable",
+    component:   "TimestampConverter",
+    category:    "converter",
+    subcategory: "timestamp",
+    tags: [
+      "timestamp", "unix", "epoch", "date", "converter",
+      "utc", "timezone", "iso8601", "unix time",
+      "epoch converter", "milliseconds to date", "date to unix",
+    ],
+    status:   "stable",
     featured: false,
-    addedAt: "2025-01-01",
+    addedAt:  "2025-01-01",
     seo: {
-      title: "Unix Timestamp Converter - Epoch Time to Human-Readable Date",
-      description: "Convert Unix epoch timestamps to UTC, local time, and ISO 8601. Supports seconds and milliseconds. Runs locally in your browser.",
+      title:       "Unix Timestamp Converter - Epoch to Date, Milliseconds Supported",
+      description: "Convert Unix timestamps (seconds or milliseconds) to UTC, local time, and ISO 8601. Supports all timezones. Runs in your browser.",
     },
     content: {
-      intro: "Unix time counts the number of seconds elapsed since the Unix epoch (January 1, 1970 00:00:00 UTC). It is the standard time representation in operating systems, databases, and APIs. This converter handles both second-precision and millisecond-precision timestamps automatically.",
-      usage: "Paste a Unix timestamp (seconds or milliseconds) to see the equivalent UTC, local, and ISO 8601 representations. Or use the date picker to convert a human-readable date back to a Unix timestamp.",
-      example: "Input (seconds):      1672531200\nUTC:   Sun, 01 Jan 2023 00:00:00 GMT\nLocal: Sun Jan 01 2023 09:00:00 GMT+0900\nISO:   2023-01-01T00:00:00.000Z\n\nInput (milliseconds): 1672531200000  → same result",
-      useCases: "1. Debugging database timestamp columns.\n2. Reading timestamps from server logs and API responses.\n3. Calculating time deltas between events.\n4. Verifying cron job and scheduler configurations.",
+      intro:    "Unix timestamps count seconds elapsed since January 1, 1970 00:00:00 UTC. They are the standard time representation in databases, APIs, and server logs. This converter handles both second-precision and millisecond-precision timestamps automatically.",
+      usage:    "Paste a Unix timestamp to see UTC, local time, and ISO 8601 equivalents. The converter auto-detects seconds (10 digits) vs milliseconds (13 digits). Use the date picker to convert a human-readable date back to a timestamp.",
+      example:  "Seconds:      1704067200\n→ UTC:         Mon, 01 Jan 2024 00:00:00 GMT\n→ ISO 8601:    2024-01-01T00:00:00.000Z\n→ Local:       Mon Jan 01 2024 09:00:00 GMT+0900\n\nMilliseconds: 1704067200000  → same result",
+      useCases: "1. Reading timestamps from server logs and database records.\n2. Debugging API responses that return epoch timestamps.\n3. Calculating time differences between events.\n4. Verifying cron job and scheduler configurations.\n5. Converting timestamps in distributed system traces.",
       faq: [
-        { q: "Does it support milliseconds?", a: "Yes. The converter automatically detects whether the input is in seconds (10 digits) or milliseconds (13 digits) and adjusts accordingly." },
-        { q: "Which timezone is 'Local'?", a: "Local time reflects the timezone configured in your browser / operating system." },
+        { q: "Does it support milliseconds?",     a: "Yes. The converter detects 10-digit inputs as seconds and 13-digit inputs as milliseconds automatically." },
+        { q: "Which timezone is 'Local Time'?",   a: "Local time reflects the timezone of your browser and operating system." },
+        { q: "What is the maximum Unix timestamp?", a: "The 32-bit max is 2,147,483,647 (January 19, 2038 — the Y2K38 problem). 64-bit systems extend this far beyond the practical future." },
       ],
     },
+    problems: [
+      "How to convert Unix timestamp to date",
+      "How to convert milliseconds to human readable date",
+      "What is epoch time",
+      "How to get current Unix timestamp",
+      "How to convert ISO 8601 to Unix timestamp",
+      "How to read timestamps from API responses",
+    ],
+    workflow: {
+      before: [],
+      after:  ["json-formatter"],
+    },
+    searchIntents: {
+      informational: ["what is unix timestamp", "what is epoch time", "unix time explained"],
+      navigational:  ["timestamp converter online", "epoch converter", "unix time converter"],
+      transactional: ["convert timestamp to date", "epoch to date online", "milliseconds to date converter"],
+    },
+    i18n: {
+      ja: {
+        name:        "タイムスタンプ変換ツール",
+        description: "Unixタイムスタンプと日付を相互変換。ミリ秒・タイムゾーン対応。",
+        seo: {
+          title:       "Unixタイムスタンプ変換 - エポック秒を日付に | AIStacker",
+          description: "Unixタイムスタンプ（秒・ミリ秒）をUTC・ローカル時刻・ISO 8601に変換。全タイムゾーン対応。",
+        },
+      },
+      zh: {
+        name:        "时间戳转换工具",
+        description: "Unix 时间戳与可读日期互转，支持毫秒和时区。",
+        seo: {
+          title:       "Unix 时间戳转换 - 在线日期转换工具 | AIStacker",
+          description: "将 Unix 时间戳（秒或毫秒）转换为 UTC、本地时间和 ISO 8601 格式，支持所有时区。",
+        },
+      },
+    },
   },
+
   {
-    slug: "url-encode",
-    name: "URL Encoder",
+    slug:        "url-encode",
+    name:        "URL Encoder",
     description: "Percent-encode strings for safe use in URLs and query parameters.",
-    component: "UrlEncoder",
-    category: "encoder",
-    tags: ["url", "encoder", "percent-encode", "uri", "query-string", "uri-component"],
-    status: "stable",
+    component:   "UrlEncoder",
+    category:    "encoder",
+    subcategory: "url",
+    tags: [
+      "url", "encoder", "percent-encode", "uri", "query-string",
+      "url escape", "url safe", "encodeURIComponent",
+      "percent encoding", "url encode spaces", "special characters url",
+    ],
+    status:   "stable",
     featured: false,
-    addedAt: "2025-01-01",
+    addedAt:  "2025-01-01",
     seo: {
-      title: "URL Encoder Online - Percent-Encoding Tool for URI Components",
-      description: "Safely encode URL components with percent-encoding. Handles spaces, special characters, and Unicode. Runs in your browser.",
+      title:       "URL Encoder Online - Percent-Encode URI Components Free",
+      description: "Percent-encode strings for safe use in URLs, query parameters, and API paths. Handles Unicode, spaces, and special characters.",
     },
     content: {
-      intro: "URL encoding (percent-encoding) replaces unsafe ASCII characters with a '%' followed by two hexadecimal digits representing the byte value. It is required when passing text as a URL query parameter or path segment to ensure the URL remains valid across all HTTP clients.",
-      usage: "Paste your plain text into the input area and click Encode. The output is a percent-encoded string safe to embed in a URL. Use the URL Decoder tool to reverse the process.",
-      example: "Input:  hello world? price=€10 & category=日本語\nOutput: hello%20world%3F%20price%3D%E2%82%AC10%20%26%20category%3D%E6%97%A5%E6%9C%AC%E8%AA%9E",
-      useCases: "1. Building query strings for GET requests.\n2. Passing special characters in API endpoint paths.\n3. Encoding form data before submission.\n4. Constructing shareable URLs with embedded parameters.",
+      intro:    "URL encoding (percent-encoding) replaces characters that are unsafe in URLs with a % sign followed by two hex digits. It is required when embedding user input, special characters, or non-ASCII text in a URL.",
+      usage:    "Paste any text into the input and click Encode. The output is safe to use in any URL context. Use URL Decoder to reverse the process.",
+      example:  "Input:  hello world? price=€10 & lang=日本語\nOutput: hello%20world%3F%20price%3D%E2%82%AC10%20%26%20lang%3D%E6%97%A5%E6%9C%AC%E8%AA%9E",
+      useCases: "1. Building query strings for GET requests with special characters.\n2. Encoding file paths for REST API endpoints.\n3. Preparing form data before manual submission.\n4. Encoding redirect URLs in OAuth flows.",
       faq: [
-        { q: "What's the difference between encodeURI and encodeURIComponent?", a: "This tool uses encodeURIComponent, which encodes everything except A–Z a–z 0–9 - _ . ! ~ * ' ( ). Use it for individual parameter values, not full URLs." },
+        { q: "What is the difference between encodeURI and encodeURIComponent?", a: "encodeURI encodes a full URL and preserves characters like / ? = &. encodeURIComponent (what this tool uses) encodes everything except letters, digits, and - _ . ! ~ * ' ( ) — use it for individual parameter values." },
+        { q: "Why is space encoded as %20 and not +?",                           a: "%20 is the standard percent-encoding for space in URI components. The + notation is only valid in application/x-www-form-urlencoded (HTML form POST bodies)." },
       ],
     },
+    problems: [
+      "How to URL encode a string online",
+      "How to encode spaces in a URL",
+      "How to encode special characters in query parameters",
+      "How to percent-encode a URL",
+      "How to encode a redirect URL in OAuth",
+      "Difference between %20 and + in URLs",
+    ],
+    workflow: {
+      before: ["json-formatter"],
+      after:  ["url-decode"],
+    },
+    searchIntents: {
+      informational: ["what is url encoding", "percent encoding explained", "url encode vs escape"],
+      navigational:  ["url encoder online", "percent encoder free", "uri encoder tool"],
+      transactional: ["url encode string online", "encode url parameters free", "percent encode online"],
+    },
+    i18n: {
+      ja: {
+        name:        "URL エンコーダー",
+        description: "URL・クエリパラメータに使用するための文字列をパーセントエンコードします。",
+        seo: {
+          title:       "URL エンコーダー - パーセントエンコーディング | AIStacker",
+          description: "URL・APIパスに使えるよう文字列をパーセントエンコード。Unicode・日本語・特殊文字対応。",
+        },
+      },
+      zh: {
+        name:        "URL 编码工具",
+        description: "将字符串进行百分比编码，安全用于 URL 和查询参数。",
+        seo: {
+          title:       "URL 编码工具 - 在线百分比编码 | AIStacker",
+          description: "将字符串编码为 URL 安全格式，处理中文、空格和特殊字符。完全在浏览器本地处理。",
+        },
+      },
+    },
   },
+
   {
-    slug: "url-decode",
-    name: "URL Decoder",
+    slug:        "url-decode",
+    name:        "URL Decoder",
     description: "Decode percent-encoded URL strings back to human-readable plain text.",
-    component: "UrlDecoder",
-    category: "encoder",
-    tags: ["url", "decoder", "percent-decode", "uri", "query-string", "uri-component"],
-    status: "stable",
+    component:   "UrlDecoder",
+    category:    "encoder",
+    subcategory: "url",
+    tags: [
+      "url", "decoder", "percent-decode", "uri", "query-string",
+      "url unescape", "decode url", "decodeURIComponent",
+      "percent decoding", "url decode spaces", "decode encoded url",
+    ],
+    status:   "stable",
     featured: false,
-    addedAt: "2025-01-01",
+    addedAt:  "2025-01-01",
     seo: {
-      title: "URL Decoder Online - Decode URI Components Instantly",
-      description: "Decode percent-encoded URL strings back to human-readable text. Handles double-encoding and Unicode. Runs in your browser.",
+      title:       "URL Decoder Online - Decode Percent-Encoded URI Components Free",
+      description: "Decode percent-encoded URL strings back to readable text instantly. Handles double-encoding, Unicode, and full query strings.",
     },
     content: {
-      intro: "URL decoding is the reverse of percent-encoding: it converts sequences like %20 back to spaces, %3F back to ?, and multi-byte sequences back to Unicode characters. It is commonly needed when reading URL parameters from logs, debugging API requests, or inspecting redirect chains.",
-      usage: "Paste a percent-encoded URL or query string into the input. Click Decode to see the original text. If the string was double-encoded, click Decode again.",
-      example: "Input:  hello%20world%3F%20category%3D%E6%97%A5%E6%9C%AC%E8%AA%9E\nOutput: hello world? category=日本語",
-      useCases: "1. Reading URL parameters from browser address bar logs.\n2. Debugging encoded API endpoints and webhooks.\n3. Extracting readable data from analytics query strings.\n4. Reversing double-encoded parameters from proxies.",
+      intro:    "URL decoding reverses percent-encoding, converting sequences like %20 back to spaces and %E6%97%A5 back to 日. It is commonly needed when reading URL parameters from logs, analyzing redirects, or inspecting OAuth flows.",
+      usage:    "Paste a percent-encoded URL or query string. Click Decode to see the original text. If the string was double-encoded, click Decode again to strip the second layer.",
+      example:  "Input:  hello%20world%3F%20lang%3D%E6%97%A5%E6%9C%AC%E8%AA%9E\nOutput: hello world? lang=日本語\n\nDouble-encoded:\nInput:  hello%2520world\nFirst:  hello%20world\nSecond: hello world",
+      useCases: "1. Reading URL parameters from access logs and analytics dashboards.\n2. Debugging encoded redirect chains in OAuth and SSO flows.\n3. Extracting readable data from encoded API webhook payloads.\n4. Reverse-engineering encoded tracking parameters.",
       faq: [
-        { q: "Can it decode multiple times?", a: "Yes. If a string was double-encoded (e.g., %2520 instead of %20), decode once to get %20, then decode again to get a space." },
+        { q: "What is double-encoding?",          a: "When an already-encoded string gets encoded again — %20 becomes %2520. Click Decode twice to fully decode a double-encoded string." },
+        { q: "Can it decode a full URL at once?",  a: "Yes. Paste the entire URL including the domain and query string — only the encoded components will be decoded, not the structural characters (/, ?, &, =)." },
       ],
     },
-  },  {
-    slug: "jwt-decoder",
-    name: "JWT Decoder",
-    description: "Decode and inspect JWT tokens instantly.",
-    component: "JwtDecoder",
-    category: "crypto" as ToolCategory,
-    tags: ["jwt", "json web token", "decoder", "inspector", "security", "authentication", "token", "base64url", "expiry", "validation", "troubleshooting"],
-    status: "new",
-    featured: false,
-    addedAt: "2026-03-20",
-    seo: {
-      title: "JWT Decoder - Decode & Inspect JSON Web Tokens",
-      description: "Instantly decode JWT tokens to inspect their header, payload, and expiry status. Copy sections, validate structure, and troubleshoot JWTs with ease.",
+    problems: [
+      "How to decode a URL encoded string",
+      "How to read percent-encoded text",
+      "How to decode %20 in a URL",
+      "How to decode double-encoded URLs",
+      "How to read encoded query parameters from logs",
+      "How to decode a URL redirect",
+    ],
+    workflow: {
+      before: ["url-encode"],
+      after:  ["json-formatter", "base64-encode"],
     },
-    content: {
-      intro: "The JWT Decoder is a simple yet powerful online tool designed to help developers and security professionals quickly understand the contents of a JSON Web Token (JWT). By simply pasting a token, you can instantly see its decoded header and payload, along with crucial expiry information. This tool simplifies debugging and validation of JWTs in various applications.",
-      usage: "To use the JWT Decoder, paste your full JWT string into the provided textarea. The tool will automatically decode the token in real-time, displaying the header and payload in a readable JSON format. You can then copy each section individually or the entire token using the dedicated copy buttons, and view its expiry status at a glance.",
-      example: "Input:\neyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjI1MjQ2MDgwMDB9.someSignatureHere\n\nOutput (Decoded Header):\n{\n  \"alg\": \"HS256\",\n  \"typ\": \"JWT\"\n}\n\nOutput (Decoded Payload):\n{\n  \"sub\": \"1234567890\",\n  \"name\": \"John Doe\",\n  \"iat\": 1516239022,\n  \"exp\": 2524608000\n}\n\nOutput (Expiry Status, as of current date):\nValid (Expires in X days) (at Dec 31, 2049, 12:00:00 AM)",
-      useCases: "1. Debugging authentication issues in web applications by inspecting token contents.\n2. Validating the claims and metadata within a JWT generated by an identity provider.\n3. Checking the expiration time of a token to understand its validity period.\n4. Analyzing JWT structure for security audits and penetration testing.\n5. Quickly extracting specific information (e.g., user ID, roles) from a token.\n6. Learning about JWT format by observing decoded components.",
-      faq: [
-        { q: "What is a JWT?", a: "A JWT (JSON Web Token) is a compact, URL-safe means of representing claims to be transferred between two parties. It consists of a header, a payload, and a signature, separated by dots." },
-        { q: "Is this tool safe for sensitive JWTs?", a: "This tool performs client-side decoding, meaning your JWT never leaves your browser. However, for highly sensitive production tokens, it is always recommended to use tools that run entirely offline or within your trusted environment." },
-        { q: "Why do I get an \"Invalid JWT format\" error?", a: "This error typically occurs if your input string does not consist of exactly three parts separated by dots (header.payload.signature), or if the header/payload parts are not valid Base64 URL encoded strings." },
-      ],
+    searchIntents: {
+      informational: ["what is url decoding", "how to read percent encoded url", "%20 meaning in url"],
+      navigational:  ["url decoder online", "percent decoder free", "uri decoder tool"],
+      transactional: ["decode url online", "url decode free", "percent decode string"],
     },
-  },  {
-    slug: "markdown-preview",
-    name: "Markdown Preview",
-    description: "Write Markdown on the left and see the live rendered HTML preview on the right.",
-    component: "MarkdownPreview",
-    category: "formatter" as ToolCategory,
-    tags: [],
-    status: "new",
-    featured: false,
-    addedAt: "2026-03-20",
-    seo: {
-      title: "Markdown Preview",
-      description: "Write Markdown on the left and see the live rendered HTML preview on the right.",
-    },
-    content: {
-      intro: "Write Markdown on the left and see the live rendered HTML preview on the right.",
-      usage: "Use the Markdown Preview by entering your input and clicking the action button.",
-      example: "",
-      useCases: "",
-      faq: [
-
-      ],
+    i18n: {
+      ja: {
+        name:        "URL デコーダー",
+        description: "パーセントエンコードされたURL文字列を読みやすいテキストにデコードします。",
+        seo: {
+          title:       "URL デコーダー - パーセントエンコード解除 | AIStacker",
+          description: "URLエンコードされた文字列を元のテキストに復元。二重エンコード・日本語対応。",
+        },
+      },
+      zh: {
+        name:        "URL 解码工具",
+        description: "将百分比编码的 URL 字符串解码为可读文本。",
+        seo: {
+          title:       "URL 解码工具 - 在线百分比解码 | AIStacker",
+          description: "将 URL 编码字符串解码为可读文本，支持中文、双重编码和完整 URL 解析。",
+        },
+      },
     },
   },
- 
-
-  {
-    slug: "ninja-text-count",
-    name: "Ninja Text Counter",
-    description: "An advanced text counter that allows you to accurately count the number of kanji, hiragana, katakana, and total characters in a piece of text. The interface is modern and optimized for mobile devices.",
-    component: "NinjaTextCount",
-    category: "text" as ToolCategory,
-    tags: ["japanese", "text-counter", "kanji", "hiragana", "katakana", "character-count", "unicode", "language-tools"],
-    status: "new",
-    featured: false,
-    addedAt: "2026-03-21",
-    seo: {
-      title: "Ninja Text Counter - Count Kanji, Hiragana & Katakana Characters Online",
-      description: "Accurately count kanji, hiragana, katakana, and total characters in Japanese text. Modern interface, real-time updates, export options. 100% private — runs in your browser.",
-    },
-    content: {
-      intro: "The Ninja Text Counter is a specialized tool for linguists, educators, and developers working with Japanese text. It provides precise counts of kanji (Chinese characters), hiragana (phonetic script), katakana (used for foreign words), and other characters, helping you analyze text composition instantly. Unlike basic counters, it handles mixed-language input and excludes spaces for accurate totals.",
-      usage: "Paste or type your Japanese text into the input area. Counts update in real-time. Use the export buttons to download results as CSV or JSON. Press Ctrl/Cmd+Enter for quick CSV export. Clear the text anytime with the button.",
-      example: "// Input (mixed Japanese/English):\nこんにちは、世界！ Hello, World! 価格は€10です。\n\n// Counts:\nKanji: 4 (世, 界, 価, 格)\nHiragana: 5 (こ, ん, に, ち, は)\nKatakana: 0\nOther: 18 (spaces, punctuation, English, etc.)\nTotal (non-space): 27",
-      useCases: "1. Analyzing Japanese literature or documents for character distribution.\n2. Validating text for language learning apps or textbooks.\n3. Debugging multilingual content in web development.\n4. Counting characters for social media posts or messaging limits.\n5. Researching linguistic patterns in Japanese corpora.",
-      faq: [
-        { q: "Does it support mixed languages?", a: "Yes. It counts only Japanese characters for kanji/hiragana/katakana, while 'Other' includes everything else (English, punctuation, etc.)." },
-        { q: "Is my text data secure?", a: "Yes. All processing happens entirely in your browser using JavaScript. No data is ever sent to a server." },
-        { q: "What Unicode ranges does it cover?", a: "Kanji: CJK Unified Ideographs (4E00-9FAF, 3400-4DBF). Hiragana: 3040-309F. Katakana: 30A0-30FF. It handles standard Japanese text accurately." },
-        { q: "Can it count spaces or punctuation?", a: "Spaces are excluded from the total count. Punctuation is counted in 'Other' if not Japanese-specific." },
-      ],
-    },
-  },
-
 ]
 
-// ─── Utility helpers ──────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Utility helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function getToolBySlug(slug: string): ToolMeta | undefined {
-  return tools.find((t) => t.slug === slug)
+  return tools.find(t => t.slug === slug)
 }
 
 export function getToolsByCategory(category: ToolCategory): ToolMeta[] {
-  return tools.filter((t) => t.category === category)
+  return tools.filter(t => t.category === category)
+}
+
+export function getToolsBySubcategory(sub: ToolSubcategory): ToolMeta[] {
+  return tools.filter(t => t.subcategory === sub)
 }
 
 export function getCategories(): ToolCategory[] {
-  return [...new Set(tools.map((t) => t.category))].sort() as ToolCategory[]
+  return [...new Set(tools.map(t => t.category))].sort() as ToolCategory[]
 }
 
 export function getFeaturedTools(): ToolMeta[] {
-  return tools.filter((t) => t.featured)
+  return tools.filter(t => t.featured)
 }
 
 export function isNewTool(tool: ToolMeta, withinDays = 30): boolean {
-  const added = new Date(tool.addedAt).getTime()
-  return Date.now() - added < withinDays * 24 * 60 * 60 * 1000
+  return Date.now() - new Date(tool.addedAt).getTime() < withinDays * 86_400_000
 }
 
-/** Score-based related tools: same category > shared tags */
-export function getRelatedTools(tool: ToolMeta, limit = 4): ToolMeta[] {
+/** Score-based related tools: workflow graph > same subcategory > shared tags */
+export function getRelatedTools(tool: ToolMeta, limit = 6): ToolMeta[] {
+  const workflowSlugs = new Set([...tool.workflow.before, ...tool.workflow.after])
   return tools
-    .filter((t) => t.slug !== tool.slug)
-    .map((t) => ({
+    .filter(t => t.slug !== tool.slug)
+    .map(t => ({
       tool: t,
       score:
-        (t.category === tool.category ? 3 : 0) +
-        t.tags.filter((tag) => tool.tags.includes(tag)).length,
+        (workflowSlugs.has(t.slug)         ? 5 : 0) +
+        (t.subcategory === tool.subcategory ? 3 : 0) +
+        (t.category    === tool.category    ? 2 : 0) +
+        t.tags.filter(tag => tool.tags.includes(tag)).length,
     }))
     .filter(({ score }) => score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
     .map(({ tool: t }) => t)
+}
+
+/** Get localized tool data, falling back to English */
+export function getLocalizedTool(tool: ToolMeta, locale: "en" | "ja" | "zh"): ToolMeta {
+  if (locale === "en" || !tool.i18n?.[locale]) return tool
+  const override = tool.i18n[locale]!
+  return {
+    ...tool,
+    name:        override.name        ?? tool.name,
+    description: override.description ?? tool.description,
+    seo:         override.seo         ?? tool.seo,
+    content:     override.content ? { ...tool.content, ...override.content } : tool.content,
+  }
 }
 
 export const CATEGORY_LABELS: Record<ToolCategory, string> = {
@@ -365,7 +644,6 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   crypto:     "Crypto",
 }
 
-// Maps category → lucide-react icon name (used in CategoryBadge)
 export const CATEGORY_ICON: Record<ToolCategory, string> = {
   formatter:  "Braces",
   encoder:    "Lock",

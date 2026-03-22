@@ -1,0 +1,71 @@
+// lib/i18n/messages/en.ts
+export const en = {
+  nav: {
+    home:         "Home",
+    allTools:     "All Tools",
+    guides:       "Guides",
+  },
+  hero: {
+    badge:        "Free · Open Source · Runs Locally",
+    headline:     "The Ultimate Developer Stack",
+    sub:          "Lightweight, browser-based tools for developers. No signup, no upload, no tracking.",
+    cta:          "Browse all tools",
+  },
+  tools: {
+    popular:      "Popular tools",
+    byCategory:   "Browse by category",
+    allTools:     "All tools",
+    searchPlaceholder: "Search tools…",
+    noResults:    "No tools found",
+    noResultsSub: "Try a different search term or category",
+    clearFilters: "Clear filters",
+    matchingQuery: "matching",
+    ofTools:      "of",
+    tools:        "tools",
+    new:          "New",
+    beta:         "Beta",
+  },
+  tool: {
+    copyButton:      "Copy",
+    copiedState:     "Copied ✓",
+    clearButton:     "Clear",
+    processButton:   "Process",
+    generateButton:  "Generate",
+    encodeButton:    "Encode",
+    decodeButton:    "Decode",
+    formatButton:    "Format",
+    relatedTools:    "Related tools",
+    workflow:        "Typical workflow",
+    workflowBefore:  "Before this tool",
+    workflowAfter:   "After this tool",
+    problems:        "What you can solve",
+    tags:            "Tags",
+    tryAlso:         "Try these next",
+  },
+  article: {
+    whatIs:      "What is",
+    howTo:       "How to use",
+    example:     "Example",
+    useCases:    "Common use cases",
+    faq:         "Frequently asked questions",
+  },
+  footer: {
+    tagline:     "All tools run locally in your browser. No data leaves your device.",
+    copyright:   "AIStacker.dev",
+  },
+  guides: {
+    title:       "Developer Guides",
+    sub:         "In-depth guides for common developer tasks.",
+    readGuide:   "Read guide",
+    relatedTools: "Tools used in this guide",
+  },
+  meta: {
+    titleSuffix: "| AIStacker",
+    homeTitle:   "AIStacker — Free Developer & AI Tools",
+    homeDesc:    "Lightweight, open-source, browser-based developer tools. JSON formatter, Base64 encoder, UUID generator, Regex tester, and 200+ more.",
+    toolsTitle:  "All Tools",
+    toolsDesc:   "Browse 200+ free developer tools. All run locally in your browser — no signup, no upload.",
+  },
+}
+
+export type Messages = typeof en

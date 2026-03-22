@@ -1,0 +1,71 @@
+// lib/i18n/messages/ja.ts
+import type { Messages } from "./en"
+
+export const ja: Messages = {
+  nav: {
+    home:         "ホーム",
+    allTools:     "全ツール",
+    guides:       "ガイド",
+  },
+  hero: {
+    badge:        "無料 · オープンソース · ローカル処理",
+    headline:     "デベロッパーのための究極のツールスタック",
+    sub:          "登録不要・アップロード不要・トラッキング不要。ブラウザ上で動作する軽量な開発ツール集。",
+    cta:          "全ツールを見る",
+  },
+  tools: {
+    popular:      "人気ツール",
+    byCategory:   "カテゴリ別",
+    allTools:     "全ツール",
+    searchPlaceholder: "ツールを検索…",
+    noResults:    "ツールが見つかりません",
+    noResultsSub: "別のキーワードやカテゴリをお試しください",
+    clearFilters: "フィルターをクリア",
+    matchingQuery: "の検索結果",
+    ofTools:      "/",
+    tools:        "ツール",
+    new:          "新着",
+    beta:         "ベータ",
+  },
+  tool: {
+    copyButton:      "コピー",
+    copiedState:     "コピー済み ✓",
+    clearButton:     "クリア",
+    processButton:   "実行",
+    generateButton:  "生成",
+    encodeButton:    "エンコード",
+    decodeButton:    "デコード",
+    formatButton:    "フォーマット",
+    relatedTools:    "関連ツール",
+    workflow:        "よくある使用フロー",
+    workflowBefore:  "このツールの前に",
+    workflowAfter:   "このツールの後に",
+    problems:        "解決できる問題",
+    tags:            "タグ",
+    tryAlso:         "次に試してみよう",
+  },
+  article: {
+    whatIs:      "とは？",
+    howTo:       "使い方",
+    example:     "使用例",
+    useCases:    "主な使用シーン",
+    faq:         "よくある質問",
+  },
+  footer: {
+    tagline:     "全ツールはブラウザ内で動作します。データは外部に送信されません。",
+    copyright:   "AIStacker.dev",
+  },
+  guides: {
+    title:       "開発者ガイド",
+    sub:         "よくある開発タスクの詳細ガイド。",
+    readGuide:   "ガイドを読む",
+    relatedTools: "このガイドで使用するツール",
+  },
+  meta: {
+    titleSuffix: "| AIStacker",
+    homeTitle:   "AIStacker — 無料デベロッパーツール集",
+    homeDesc:    "JSON整形・Base64エンコード・UUID生成・正規表現テストなど200以上の開発ツール。完全ブラウザ処理。",
+    toolsTitle:  "全ツール一覧",
+    toolsDesc:   "200以上の無料開発ツール。登録不要・アップロード不要でブラウザ上で動作。",
+  },
+}
