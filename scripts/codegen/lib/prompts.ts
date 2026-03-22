@@ -1,4 +1,4 @@
-// scripts/codegen/lib/prompts.ts
+// scripts/codegen/lib/prompts.ts — updated 20260322
 //
 // KEY CHANGES vs previous version:
 //
@@ -22,6 +22,10 @@
 // 4. METADATA-ONLY FIX PROMPT
 //    When metadata is missing, sends a targeted prompt for metadata only,
 //    not a full regeneration. Saves tokens and retries.
+//
+// 5. PROBLEMS + WORKFLOW FIELDS — added
+//    buildIdeaToSpecPrompt now outputs problems[], workflow{}, searchIntents{}
+//    so generated tools are SEO-ready from the start.
 
 import type { ComponentRequest } from "./contract.js"
 import type { StaticCheckResult } from "./staticChecker.js"
@@ -107,9 +111,8 @@ const copyToClipboard = useCallback(async (text: string, id: string) => {
 Copy button JSX: \`<button onClick={() => copyToClipboard(text, "result")}>{copied === "result" ? "Copied ✓" : "Copy"}</button>\`
 
 ## Output format — CRITICAL
-Output ONLY the raw file content. No explanation, no prose, no markdown fence.
-Start the response with exactly this string (including the quotes):
-"use client"
+Output ONLY the raw .tsx file content. No explanation, no prose, no markdown fence.
+Start the response with exactly this string (including the quotes): "use client"
 
 The response must end with the closing brace of the component. Nothing else.`
 }
@@ -169,6 +172,18 @@ Q: (common question)
 A: (direct answer)
 === END FAQ ===
 
+=== PROBLEMS ===
+(6 specific user problems this tool solves, one per line, formatted as "How to X" questions)
+=== END PROBLEMS ===
+
+=== WORKFLOW_BEFORE ===
+(comma-separated slugs of tools typically used BEFORE this one, or empty)
+=== END WORKFLOW_BEFORE ===
+
+=== WORKFLOW_AFTER ===
+(comma-separated slugs of tools typically used AFTER this one, or empty)
+=== END WORKFLOW_AFTER ===
+
 Output ONLY the sections above. No prose before or after.`
 }
 
@@ -225,12 +240,20 @@ The generator needs a ComponentRequest with these fields:
 - displayName: title-cased human name
 - description: one sentence, max 160 chars, SEO-optimized, specific (mention key formats/features)
 - category: exactly one of: formatter encoder generator tester converter japanese text number color image network crypto
-- tags: 6-10 lowercase search tags
-- features: array of 6-10 SPECIFIC UI behaviors
+- tags: 6-10 lowercase tags including 2-3 alias phrases users might search
+- features: 6-10 SPECIFIC UI behaviors (not vague goals)
+- problems: 6 "How to X" questions this tool answers (for SEO)
+- workflowBefore: array of tool slugs typically used before this tool
+- workflowAfter: array of tool slugs typically used after this tool
+- searchIntents: { informational: string[], navigational: string[], transactional: string[] }
+
+Known tool slugs for workflow fields:
+json-formatter, base64-encode, url-encode, url-decode, uuid-generator,
+regex-tester, timestamp-converter
 
 Rules for features:
 - Each feature = one concrete UI behavior (what element, what trigger, what result)
-- Must include: an error state feature, a copy feature, at least one live/reactive feature
+- Must include: an error state feature, a copy feedback feature, at least one live/reactive feature
 - Must NOT include vague items like "good UX", "clean design", "easy to use"
 - Format: "verb + object + qualifier" — e.g. "show error message inline when input is invalid JSON"
 
@@ -244,14 +267,22 @@ Research this tool category. Think about:
 2. What features do users complain are missing from existing tools?
 3. What would make this tool genuinely better than alternatives?
 
-Output ONLY valid JSON matching this TypeScript interface — no prose, no markdown:
+Output ONLY valid JSON matching this TypeScript interface — no prose, no markdown fences:
 {
   "toolId": string,
   "displayName": string,
   "description": string,
   "category": string,
   "tags": string[],
-  "features": string[]
+  "features": string[],
+  "problems": string[],
+  "workflowBefore": string[],
+  "workflowAfter": string[],
+  "searchIntents": {
+    "informational": string[],
+    "navigational": string[],
+    "transactional": string[]
+  }
 }`
 }
 

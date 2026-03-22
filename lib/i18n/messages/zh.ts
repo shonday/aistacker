@@ -1,0 +1,71 @@
+// lib/i18n/messages/zh.ts
+import type { Messages } from "./en"
+
+export const zh: Messages = {
+  nav: {
+    home:         "首页",
+    allTools:     "全部工具",
+    guides:       "指南",
+  },
+  hero: {
+    badge:        "免费 · 开源 · 本地运行",
+    headline:     "开发者的终极工具箱",
+    sub:          "轻量级、基于浏览器的开发工具集。无需注册、无需上传、无跟踪。",
+    cta:          "浏览全部工具",
+  },
+  tools: {
+    popular:      "热门工具",
+    byCategory:   "按类别浏览",
+    allTools:     "全部工具",
+    searchPlaceholder: "搜索工具…",
+    noResults:    "未找到工具",
+    noResultsSub: "请尝试不同的搜索词或类别",
+    clearFilters: "清除筛选",
+    matchingQuery: "匹配",
+    ofTools:      "/",
+    tools:        "个工具",
+    new:          "新上线",
+    beta:         "测试版",
+  },
+  tool: {
+    copyButton:      "复制",
+    copiedState:     "已复制 ✓",
+    clearButton:     "清空",
+    processButton:   "处理",
+    generateButton:  "生成",
+    encodeButton:    "编码",
+    decodeButton:    "解码",
+    formatButton:    "格式化",
+    relatedTools:    "相关工具",
+    workflow:        "典型使用流程",
+    workflowBefore:  "使用此工具之前",
+    workflowAfter:   "使用此工具之后",
+    problems:        "可以解决的问题",
+    tags:            "标签",
+    tryAlso:         "接下来试试",
+  },
+  article: {
+    whatIs:      "是什么？",
+    howTo:       "如何使用",
+    example:     "使用示例",
+    useCases:    "常见使用场景",
+    faq:         "常见问题",
+  },
+  footer: {
+    tagline:     "所有工具在浏览器本地运行，数据不会离开您的设备。",
+    copyright:   "AIStacker.dev",
+  },
+  guides: {
+    title:       "开发者指南",
+    sub:         "常见开发任务的深度指南。",
+    readGuide:   "阅读指南",
+    relatedTools: "本指南使用的工具",
+  },
+  meta: {
+    titleSuffix: "| AIStacker",
+    homeTitle:   "AIStacker — 免费开发者工具集",
+    homeDesc:    "JSON 格式化、Base64 编解码、UUID 生成、正则测试等 200+ 开发工具，完全在浏览器本地运行。",
+    toolsTitle:  "全部工具",
+    toolsDesc:   "200+ 免费开发者工具，无需注册，无需上传，全部在浏览器本地运行。",
+  },
+}

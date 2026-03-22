@@ -6,7 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
-    "postbuild": "next-sitemap",
+    "postbuild": "node scripts/build-sitemap-data.mjs && next-sitemap",
     "lint": "eslint",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",

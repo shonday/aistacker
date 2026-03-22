@@ -1,16 +1,73 @@
 [
   {
-    "toolId": "ninja-text-count",
-    "displayName": "Ninja Text Counter",
-    "description": "An advanced text counter that allows you to accurately count the number of kanji, hiragana, katakana, and total characters in a piece of text. The interface is modern and optimized for mobile devices.",
-    "category": "formatter encoder generator tester converter japanese text number color image network crypto",
-    "tags": ["kanji", "hiragana", "katakana", "total characters", "text counter", "modern ui", "mobile-friendly"],
+    "toolId": "jwt-decoder",
+    "displayName": "JWT Decoder",
+    "description": "Decode and inspect JWT tokens — header, payload, and signature — instantly in your browser.",
     "features": [
-      "show error message inline when input is invalid Japanese text",
-      "live/reactive feature for real-time updates of the character counts",
-      "precision in counting individual kanji, hiragana, and katakana",
-      "feature to count total characters",
-      "option to export character counts in various formats (CSV, JSON)"
+      "paste JWT and decode header",
+      "decode payload with pretty JSON",
+      "show signature section",
+      "show token expiry status (expired / valid)",
+      "copy individual sections",
+      "warn if token is expired"
     ]
+  },
+  {
+    "toolId": "japanese-word-count",
+    "displayName": "Japanese Word Counter",
+    "description": "Count hiragana, katakana, kanji, and total characters in Japanese text instantly.",
+    "features": [
+      "count hiragana characters",
+      "count katakana characters",
+      "count kanji characters",
+      "count total characters (including spaces)",
+      "count total characters (excluding spaces)",
+      "live update as user types",
+      "copy summary to clipboard"
+    ],
+    "category": "japanese"
+  },
+  {
+    "toolId": "color-converter",
+    "displayName": "Color Converter",
+    "description": "Convert colors between HEX, RGB, HSL, and HSB formats with a live color preview.",
+    "features": [
+      "input HEX and convert to RGB, HSL, HSB",
+      "input RGB and convert to HEX, HSL, HSB",
+      "live color swatch preview",
+      "copy any format to clipboard",
+      "color picker input"
+    ],
+    "category": "color"
+  },
+  {
+    "toolId": "hash-generator",
+    "displayName": "Hash Generator",
+    "description": "Generate MD5, SHA-1, SHA-256, and SHA-512 hashes from any text input.",
+    "features": [
+      "generate MD5 hash",
+      "generate SHA-1 hash",
+      "generate SHA-256 hash",
+      "generate SHA-512 hash",
+      "show all four hashes simultaneously",
+      "copy individual hashes",
+      "live update as user types"
+    ],
+    "category": "crypto"
+  },
+  {
+    "toolId": "markdown-preview",
+    "displayName": "Markdown Preview",
+    "description": "Write Markdown on the left and see the live rendered HTML preview on the right.",
+    "features": [
+      "split-pane editor and preview",
+      "live rendering as user types",
+      "support headings, bold, italic, code blocks, tables, lists",
+      "copy rendered HTML to clipboard",
+      "copy raw Markdown to clipboard",
+      "syntax-highlighted code blocks in preview"
+    ],
+    "category": "text"
   }
 ]
+
