@@ -1,4 +1,4 @@
-// proxy.ts — locale routing
+// middleware.ts — locale routing
 // Detects browser language from Accept-Language header and redirects
 // non-English users to the appropriate locale-prefixed URL.
 // English is the default — served at the root with no prefix.
@@ -23,7 +23,7 @@ const BYPASS = [
   ".txt",
 ]
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Skip static assets and API routes
