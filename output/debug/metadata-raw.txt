@@ -1,43 +1,44 @@
-=== CATEGORY ===
-text analysis
-=== END CATEGORY ===
-
-=== TAGS ===
-japanese text, character counter, kanji counter, hiragana counter, katakana counter
-=== END TAGS ===
-
-=== SEO_TITLE ===
-Japanese Text Counter Tool
-=== END SEO_TITLE ===
-
-=== SEO_DESC ===
-Count Japanese characters, including kanji, hiragana, and katakana, with this free online tool, perfect for language learners and developers needing to track character usage in their projects.
-=== END SEO_DESC ===
-
-=== INTRO ===
-The Ninja Text Counter is a handy tool for developers and language learners to count the number of Japanese characters in a given text, helping them understand and work with the unique aspects of the Japanese language. By using this tool, developers can easily track character usage in their projects and ensure compliance with specific requirements.
-=== END INTRO ===
-
-=== USAGE ===
-To use the Ninja Text Counter, simply paste the Japanese text into the input field and the tool will automatically count the number of kanji, hiragana, and katakana characters, providing a total count as well. The tool also allows users to copy the results, making it easy to integrate the counted characters into their projects.
-=== END USAGE ===
-
-=== EXAMPLE ===
-Input: 
-Output: Kanji: 5, Hiragana: 10, Katakana: 2, Total: 17
-=== END EXAMPLE ===
-
-=== USE_CASES ===
-1. Language learners can use the Ninja Text Counter to track their progress in learning Japanese characters, focusing on specific scripts like kanji or hiragana.
-2. Developers can utilize the tool to count characters in Japanese text for projects requiring specific character limits, such as subtitles or captions.
-3. Content creators can use the Ninja Text Counter to optimize their Japanese content for better readability and engagement.
-4. Researchers can apply the tool to analyze the frequency and usage of different Japanese characters in various texts, gaining insights into linguistic patterns.
-=== END USE_CASES ===
-
-=== FAQ ===
-Q: How does the Ninja Text Counter distinguish between kanji, hiragana, and katakana characters?
-A: The tool uses regular expressions to identify and count the different types of Japanese characters.
-
-Q: Can I use the Ninja Text Counter for other languages besides Japanese?
-A: No, the Ninja Text Counter is specifically designed for counting Japanese characters and may not provide accurate results for other languages.
-=== END FAQ ===
+```json
+{
+  "category": "converter",
+  "tags": [
+    "color",
+    "conversion",
+    "hex",
+    "rgb",
+    "hsl"
+  ],
+  "seo_title": "Convert between Hex, RGB, and HSL Colors - Convert any color to its RGB, HEX, or HSL values instantly",
+  "seo_desc": "Convert any color to its RGB, HEX, or HSL values instantly. Save time with our easy-to-use tool.",
+  "intro": "Transform colors effortlessly with our Color Converter! Simply input a color in hexadecimal format (hex), and we'll provide you with its corresponding RGB, HEX, and HSL values. Our tool is perfect for developers looking to maintain uniformity across their projects. Convert between hex, rgb, and hsl quickly and easily!",
+  "usage": "To use the Color Converter, simply input a color in hexadecimal format (hex). Our tool will provide you with its corresponding RGB, HEX, and HSL values. Save time with our easy-to-use tool.",
+  "example": "#ff0000 -> (255, 0, 0), (255, 0, 0), #ff0000",
+  "use_cases": [
+    "Web development: Convert colors in code snippets for consistency",
+    "Graphic design: Create color palettes with accurate RGB and HEX values",
+    "Marketing: Enhance color theory visuals with RGB and HSL conversions"
+  ],
+  "faq": [
+    "Q: How to convert between hex, rgb, and hsl?",
+    "A: Simply input a color in hexadecimal format (hex) into our Color Converter. Our tool will provide you with its corresponding RGB, HEX, and HSL values.",
+    "Q: Can I use this tool on all devices?",
+    "A: Yes, this tool is fully responsive and works well on desktops, laptops, tablets, and mobile devices.",
+    "Q: What are the differences between hex, rgb, and hsl colors?",
+    "A: Hexadecimal color codes (like #ffffff) represent a single color using six digits (0-9 and A-F), RGB color codes (like (255, 0, 0)) represent three numbers representing red, green, and blue values respectively, and HSL color codes (like (180, 100%, 50%)) represent hue, saturation, and lightness values respectively."
+  ],
+  "problems": [
+    "How to convert between hex, rgb, and hsl?",
+    "Can I use this tool on all devices?",
+    "What are the differences between hex, rgb, and hsl colors?",
+    "Why do RGB values sometimes have a negative value?"
+  ],
+  "workflow_before": [
+    "Color picker",
+    "Adobe Photoshop"
+  ],
+  "workflow_after": [
+    "Image editing software",
+    "Web design tools"
+  ]
+}
+```

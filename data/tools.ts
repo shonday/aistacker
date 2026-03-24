@@ -15,7 +15,7 @@ export type ToolSubcategory =
   | "json" | "yaml" | "xml" | "csv"
   | "base64" | "url" | "html" | "jwt"
   | "uuid" | "hash" | "password"
-  | "regex" | "diff" | "lint"
+  | "regex" | "diff" | "lint" | "design"
   | "timestamp" | "timezone" | "color-space"
   | "markdown" | "unicode" | "word-count"
   | "number-base" | "ip" | "dns" | "counter"
@@ -931,7 +931,69 @@ export const tools: ToolMeta[] = [
       },
     },
   },
-
+  {
+    "slug": "color-converter",
+    "name": "Color Converter",
+    "description": "Convert colors between HEX, RGB, and HSL formats instantly with live preview and contrast checking.",
+    "component": "ColorConverter",
+    "category": "generator",
+    "subcategory": "design",
+    "tags": [
+      "color converter", "hex to rgb", "rgb to hsl", "hex to hsl", "color picker",
+      "web design tool", "css color", "frontend utility", "color palette",
+      "convert hex online", "rgb to hex converter", "hsl color picker"
+    ],
+    "status": "new",
+    "featured": true,
+    "addedAt": "2026-03-24",
+    "seo": {
+      "title": "Color Converter Online - HEX, RGB, HSL Conversion Tool",
+      "description": "The ultimate color conversion tool. Instantly convert HEX to RGB and HSL. Includes live color preview, dark/light mode detection, and one-click copy."
+    },
+    "content": {
+      "intro": "Colors on the web are typically represented in three main formats: HEX (hexadecimal), RGB (Red, Green, Blue), and HSL (Hue, Saturation, Lightness). This tool provides a seamless way to switch between these formats while maintaining visual accuracy.",
+      "usage": "Enter a hex color code (e.g., #6366f1) in the input field or use the color picker to select a custom shade. The RGB and HSL values will update in real-time. Use the copy button next to each value to use it in your CSS or design software.",
+      "example": "Input: #6366f1\n\nRGB: rgb(99, 102, 241)\nHSL: hsl(239°, 84%, 67%)\nPreview: A vibrant indigo shade perfect for primary buttons.",
+      "useCases": "1. Converting design specs (Figma/Sketch) into CSS-ready RGB or HSL values.\n2. Checking if a color is 'dark' or 'light' for optimal text contrast.\n3. Experimenting with different shades using the random color generator.\n4. Quick color picking for frontend development and UI prototyping.",
+      "faq": [
+        { "q": "Does this support 3-digit hex codes?", "a": "Yes. Short hex codes like #F00 are automatically expanded to their full 6-digit equivalent (#FF0000) during conversion." },
+        { "q": "What is the difference between RGB and HSL?", "a": "RGB is based on how screens emit light (Red, Green, Blue), while HSL is more intuitive for humans, describing color by its hue, richness (saturation), and brightness (lightness)." },
+        { "q": "Is the conversion accurate?", "a": "Absolutely. The tool uses standard mathematical formulas for color space conversion to ensure the values remain consistent across all formats." }
+      ]
+    },
+    "problems": [
+      "How to convert hex to rgb in css",
+      "How to find hsl value of a color",
+      "Convert rgb to hex online",
+      "Best way to pick web colors",
+      "How to check color contrast",
+      "Online color format switcher"
+    ],
+    "workflow": { "before": ["image-color-picker"], "after": ["css-gradient-generator"] },
+    "searchIntents": {
+      "informational": ["how hex colors work", "difference between rgb and hsl", "css color formats explained"],
+      "navigational": ["color converter online", "hex to rgb tool", "color picker tool"],
+      "transactional": ["convert hex to hsl free", "copy rgb values online", "generate random hex color"]
+    },
+    "i18n": {
+      "ja": {
+        "name": "カラーコンバーター",
+        "description": "HEX、RGB、HSL形式の間で色を即座に変換し、ライブプレビューとコントラスト確認が可能です。",
+        "seo": {
+          "title": "カラーコンバーター - HEX/RGB/HSL オンライン変換ツール | AIStacker",
+          "description": "HEXをRGBやHSLに瞬時に変換。ライブプレビュー、ダーク/ライトモード判定、ワンクリックコピー機能を搭載。"
+        }
+      },
+      "zh": {
+        "name": "颜色转换器",
+        "description": "在 HEX、RGB 和 HSL 格式之间即时转换颜色，支持实时预览和对比度检测。",
+        "seo": {
+          "title": "在线颜色转换器 - HEX, RGB, HSL 互转工具 | AIStacker",
+          "description": "终极颜色转换工具。支持 HEX 转 RGB 和 HSL，提供实时颜色预览、深浅色检测及一键复制功能。"
+        }
+      }
+    }
+  },
 
 
 
