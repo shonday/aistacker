@@ -22,5 +22,6 @@ export const toolRegistry: Record<string, React.ComponentType> = {
   // Wave 1 — Phase 4
   JwtDecoder:         dynamic(() => import("@/components/tools/JwtDecoder")),
   HashGenerator:      dynamic(() => import("@/components/tools/HashGenerator")),
+  ColorConverter:     dynamic(() => import("@/components/tools/ColorConverter")),
 }
   

@@ -1,114 +1,182 @@
+```tsx
 "use client"
 
 import { useState, useCallback } from "react"
-import { Button, Spinner } from "@/components/ui"
-import { Check } from "lucide-react"
+import { IconCopy as CopyIcon } from "@heroicons/react/24/outline"
+import { useColorConverter } from "@/components/hooks/use-color-converter"
+import { Textarea, Button } from "@/components/ui/text-area"
+import { Select, Input } from "@/components/ui/select"
 
-const japaneseRegex = /^[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]+$/;
-const kanjiRegex = /[\u4e00-\u9faf\u3400-\u4dbf]/g;
-const hiraganaRegex = /[\u3040-\u309f]/g;
-const katakanaRegex = /[\u30a0-\u30ff]/g;
+const ColorConverter = () => {
+  const [hexCode, setHexCode] = useState<string>("#FFFFFF")
+  const [rgbValues, setRgbValues] = useState<[number, number, number]>([0, 0, 0])
+  const [hslValues, setHslValues] = useState<[number, number, number]>([0, 0, 0])
 
-export default function NinjaTextCount() {
-  const [text, setText] = useState("")
-  const [error, setError] = useState("")
-  const [counts, setCounts] = useState({ kanji: 0, hiragana: 0, katakana: 0, total: 0 })
-  const [loading, setLoading] = useState(false)
-  const [copied, setCopied] = useState<string | null>(null)
+  const { isValidHex, isValidRgb, isValidHsl } = useColorConverter(hexCode)
 
-  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newText = e.target.value
-    setText(newText)
-    if (!japaneseRegex.test(newText)) {
-      setError("Invalid Japanese text")
-    } else {
-      setError("")
-    }
-    countCharacters(newText)
-  }, [])
-
-  const countCharacters = useCallback((text: string) => {
-    const kanjiCount = (text.match(kanjiRegex) || []).length
-    const hiraganaCount = (text.match(hiraganaRegex) || []).length
-    const katakanaCount = (text.match(katakanaRegex) || []).length
-    const totalCount = text.length
-    setCounts({ kanji: kanjiCount, hiragana: hiraganaCount, katakana: katakanaCount, total: totalCount })
-  }, [])
-
-  const copyToClipboard = useCallback(async (text: string, id: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-    } catch {
-      const el = document.createElement("textarea")
-      el.value = text
-      document.body.appendChild(el)
-      el.select()
-      document.execCommand("copy")
-      document.body.removeChild(el)
-    }
-    setCopied(id)
-    setTimeout(() => setCopied(null), 1500)
-  }, [])
-
-  const handleExport = useCallback((format: string) => {
-    if (format === "csv") {
-      const csvText = `Kanji,${counts.kanji}\nHiragana,${counts.hiragana}\nKatakana,${counts.katakana}\nTotal,${counts.total}`
-      copyToClipboard(csvText, "export")
-    } else if (format === "json") {
-      const jsonText = JSON.stringify(counts, null, 2)
-      copyToClipboard(jsonText, "export")
-    }
-  }, [counts, copyToClipboard])
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.ctrlKey && e.key === "Enter" || e.metaKey && e.key === "Enter") {
-      handleExport("csv")
-    }
-  }, [handleExport])
+  const handleCopyClick = useCallback(() => {
+    copyToClipboard(text, "result")
+  }, [text, copyToClipboard])
 
   return (
-    <div className="bg-background p-4 rounded">
-      <h2 className="text-foreground mb-4">Ninja Text Counter</h2>
-      {error ? (
-        <p className="text-destructive mb-4">{error}</p>
-      ) : (
-        <p className="text-muted-foreground mb-4">Enter Japanese text to count characters</p>
-      )}
-      <textarea
-        className="bg-muted p-2 rounded w-full h-40"
-        value={text}
-        onChange={handleTextChange}
-        onKeyDown={handleKeyDown}
-        placeholder="Enter Japanese text"
-      />
-      {loading ? (
-        <Spinner className="mx-auto mt-4" />
-      ) : (
-        <div className="mt-4">
-          <p className="text-foreground mb-2">Kanji: {counts.kanji}</p>
-          <p className="text-foreground mb-2">Hiragana: {counts.hiragana}</p>
-          <p className="text-foreground mb-2">Katakana: {counts.katakana}</p>
-          <p className="text-foreground mb-2">Total: {counts.total}</p>
-          <Button
-            className="mb-2"
-            onClick={() => handleExport("csv")}
-          >
-            Export as CSV
-          </Button>
-          <Button
-            className="mb-2"
-            onClick={() => handleExport("json")}
-          >
-            Export as JSON
-          </Button>
-          <button
-            className="bg-primary text-primary-foreground p-2 rounded"
-            onClick={() => copyToClipboard(JSON.stringify(counts, null, 2), "result")}
-          >
-            {copied === "result" ? "Copied ✓" : "Copy result"}
-          </button>
+    <div className="flex flex-col space-y-4">
+      <h2 className="text-xl font-bold">Color Converter</h2>
+      <div className="space-y-2">
+        <Textarea
+          value={hexCode}
+          onChange={(e) => setHexCode(e.target.value)}
+          placeholder="#FFFFFF"
+          className="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500"
+        />
+        <div className="flex space-x-4">
+          <Input
+            value={rgbValues.join(", ")}
+            onChange={(e) => setRgbValues(e.target.value.split(",").map(Number))}
+            placeholder="255, 255, 255"
+            className="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500"
+          />
+          <Input
+            value={hslValues.join(", ")}
+            onChange={(e) => setHslValues(e.target.value.split(",").map(Number))}
+            placeholder="180, 100%, 50%"
+            className="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500"
+          />
         </div>
+      </div>
+
+      {isValidHex && (
+        <pre className="bg-primary bg-opacity-75 p-2 rounded-md shadow-lg text-white">
+          <code className="language-text">{hexCode}</code>
+        </pre>
       )}
+
+      {isValidRgb && (
+        <pre className="bg-primary bg-opacity-75 p-2 rounded-md shadow-lg text-white">
+          <code className="language-text">{rgbValues.join(", ")}</code>
+        </pre>
+      )}
+
+      {isValidHsl && (
+        <pre className="bg-primary bg-opacity-75 p-2 rounded-md shadow-lg text-white">
+          <code className="language-text">{hslValues.join(", ")}</code>
+        </pre>
+      )}
+
+      <div className="flex space-x-4 items-center justify-between mt-4">
+        {isValidHex && (
+          <Button
+            variant="outline"
+            onClick={() => {
+              setHexCode("#FFFFFF")
+              setRgbValues([0, 0, 0])
+              setHslValues([0, 0, 0])
+            }}
+            className="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500"
+          >
+            Reset
+          </Button>
+        )}
+
+        {isValidHex && (
+          <Button
+            variant="primary"
+            onClick={() => {
+              const result = convertToRgb(hexCode)
+              setRgbValues(result)
+              setHslValues(convertToHsl(result))
+            }}
+            className="w-full p-2 rounded-md border border-blue-500 focus:outline-none focus:border-blue-500"
+          >
+            Convert to RGB
+          </Button>
+        )}
+
+        {isValidHex && (
+          <Button
+            variant="primary"
+            onClick={() => {
+              const result = convertToHsl(hexCode)
+              setHslValues(result)
+              setRgbValues(convertToRgb(result))
+            }}
+            className="w-full p-2 rounded-md border border-blue-500 focus:outline-none focus:border-blue-500"
+          >
+            Convert to HSL
+          </Button>
+        )}
+      </div>
+
+      <div className="flex space-x-4 mt-4">
+        {isValidHex && (
+          <Button
+            variant="primary"
+            onClick={handleCopyClick}
+            className="w-full p-2 rounded-md border border-blue-500 focus:outline-none focus:border-blue-500"
+          >
+            Copy result
+          </Button>
+        )}
+      </div>
     </div>
   )
 }
+
+function convertToRgb(hexCode: string): [number, number, number] {
+  const r = parseInt(hexCode.substring(1, 3), 16)
+  const g = parseInt(hexCode.substring(3, 5), 16)
+  const b = parseInt(hexCode.substring(5, 7), 16)
+  return [r, g, b]
+}
+
+function convertToHsl(rgb: [number, number, number]): [number, number, number] {
+  const r = rgb[0] / 255
+  const g = rgb[1] / 255
+  const b = rgb[2] / 255
+
+  let max = Math.max(r, g, b)
+  let min = Math.min(r, g, b)
+
+  const delta = max - min
+
+  let h: number
+  if (delta === 0) {
+    h = 0
+  } else if (max === r) {
+    h = ((g - b) / delta) % 6
+  } else if (max === g) {
+    h = ((b - r) / delta + 2) % 6
+  } else {
+    h = ((r - g) / delta + 4) % 6
+  }
+
+  const s: number = delta === 0 ? 0 : delta / max
+
+  let l: number = (max + min) / 2
+
+  return [h * 360, s * 100, l * 100]
+}
+
+function useColorConverter(hexCode: string): {
+  isValidHex: boolean
+  isValidRgb: boolean
+  isValidHsl: boolean
+} {
+  const [isValidHex, setIsValidHex] = useState(false)
+  const [isValidRgb, setIsValidRgb] = useState(false)
+  const [isValidHsl, setIsValidHsl] = useState(false)
+
+  useEffect(() => {
+    setIsValidHex(isValidHexCode.length === 7 && isValidHexCode.match(/^#([A-Fa-f0-9]{3}){1,2}$/))
+    setIsValidRgb(isValidHexCode.length === 7 && isValidHexCode.match(/^#([A-Fa-f0-9]{3})([A-Fa-f0-9]{2})$/))
+    setIsValidHsl(isValidHexCode.length === 7 && isValidHexCode.match(/^#([A-Fa-f0-9]{6})$/))
+  }, [hexCode])
+
+  return {
+    isValidHex,
+    isValidRgb,
+    isValidHsl,
+  }
+}
+
+export default ColorConverter
+```

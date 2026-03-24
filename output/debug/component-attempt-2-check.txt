@@ -1,0 +1,89 @@
+{
+  "passed": true,
+  "issues": [
+    {
+      "rule": "hardcoded-color",
+      "severity": "warn",
+      "message": "Hardcoded Tailwind palette color. Use semantic tokens (text-muted-foreground, bg-muted, etc.).",
+      "line": 50
+    },
+    {
+      "rule": "hardcoded-color",
+      "severity": "warn",
+      "message": "Hardcoded Tailwind palette color. Use semantic tokens (text-muted-foreground, bg-muted, etc.).",
+      "line": 53
+    },
+    {
+      "rule": "hardcoded-color",
+      "severity": "warn",
+      "message": "Hardcoded Tailwind palette color. Use semantic tokens (text-muted-foreground, bg-muted, etc.).",
+      "line": 54
+    },
+    {
+      "rule": "hardcoded-color",
+      "severity": "warn",
+      "message": "Hardcoded Tailwind palette color. Use semantic tokens (text-muted-foreground, bg-muted, etc.).",
+      "line": 60
+    },
+    {
+      "rule": "hardcoded-color",
+      "severity": "warn",
+      "message": "Hardcoded Tailwind palette color. Use semantic tokens (text-muted-foreground, bg-muted, etc.).",
+      "line": 68
+    },
+    {
+      "rule": "hardcoded-color",
+      "severity": "warn",
+      "message": "Hardcoded Tailwind palette color. Use semantic tokens (text-muted-foreground, bg-muted, etc.).",
+      "line": 74
+    },
+    {
+      "rule": "hardcoded-color",
+      "severity": "warn",
+      "message": "Hardcoded Tailwind palette color. Use semantic tokens (text-muted-foreground, bg-muted, etc.).",
+      "line": 79
+    },
+    {
+      "rule": "hardcoded-color",
+      "severity": "warn",
+      "message": "Hardcoded Tailwind palette color. Use semantic tokens (text-muted-foreground, bg-muted, etc.).",
+      "line": 85
+    },
+    {
+      "rule": "hardcoded-color",
+      "severity": "warn",
+      "message": "Hardcoded Tailwind palette color. Use semantic tokens (text-muted-foreground, bg-muted, etc.).",
+      "line": 90
+    },
+    {
+      "rule": "hardcoded-color",
+      "severity": "warn",
+      "message": "Hardcoded Tailwind palette color. Use semantic tokens (text-muted-foreground, bg-muted, etc.).",
+      "line": 96
+    },
+    {
+      "rule": "a11y-input-label",
+      "severity": "warn",
+      "message": "<input> has no id or aria-label.",
+      "line": 46
+    },
+    {
+      "rule": "a11y-input-label",
+      "severity": "warn",
+      "message": "<input> has no id or aria-label.",
+      "line": 69
+    },
+    {
+      "rule": "a11y-input-label",
+      "severity": "warn",
+      "message": "<input> has no id or aria-label.",
+      "line": 80
+    },
+    {
+      "rule": "a11y-input-label",
+      "severity": "warn",
+      "message": "<input> has no id or aria-label.",
+      "line": 91
+    }
+  ]
+}

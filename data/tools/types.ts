@@ -9,7 +9,7 @@ export type ToolSubcategory =
   | "json" | "yaml" | "xml" | "csv"
   | "base64" | "url" | "html" | "jwt"
   | "uuid" | "hash" | "password"
-  | "regex" | "diff" | "lint"
+  | "regex" | "diff" | "lint" | "design"
   | "timestamp" | "timezone" | "color-space"
   | "markdown" | "unicode" | "word-count"
   | "number-base" | "ip" | "dns"
