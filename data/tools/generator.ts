@@ -64,4 +64,69 @@ export const generatorTools: ToolMeta[] = [
       },
     },
   },
+  {
+    "slug": "danmaku-to-ass-converter",
+    "name": "Danmaku2ASS Converter (Bilibili XML)",
+    "description": "High-performance XML to ASS subtitle converter. Transform Bilibili/AcFun danmaku into high-quality, collision-free subtitles for IINA, VLC, and Movist.",
+    "component": "Danmaku2ASS",
+    "category": "converter",
+    "subcategory": "danmaku2ass",
+    "tags": [
+      "danmaku2ass online", "xml to ass converter", "bilibili danmaku download",
+      "convert xml subtitles to ass", "danmaku for iina", "bilibili to ass converter",
+      "collision-free danmaku", "danmaku to vlc", "local danmaku parser", "ass subtitle generator"
+    ],
+    "status": "new",
+    "featured": true,
+    "addedAt": "2026-03-25",
+    "seo": {
+      "title": "Danmaku2ASS Online - Convert Bilibili XML to High-Quality Subtitles",
+      "description": "Convert Bilibili XML danmaku to ASS subtitles with smart collision avoidance. 100% browser-side processing, secure, and supports custom font sizes and opacity."
+    },
+    "content": {
+      "intro": "Danmaku2ASS is an essential tool for anime fans and video enthusiasts. It converts the proprietary XML danmaku format used by Bilibili into the universal ASS (Advanced Substation Alpha) format, allowing you to enjoy 'scrolling comments' in professional local players like IINA, VLC, or MPV.",
+      "usage": "Simply paste your XML content or upload the .xml file. Adjust settings such as 'Font Size' or 'Duration' to match your video resolution, then click 'Convert'. The tool uses a specialized track-based algorithm to ensure danmaku don't overlap, creating a clean viewing experience.",
+      "example": "Input (XML):\n<d p=\"12.5,1,25,16777215,... \">Hello World</d>\n\nOutput (ASS):\nDialogue: 0,00:00:12.50,00:00:20.50,Default,,{\\move(1920,50,-500,50)}Hello World",
+      "useCases": "1. Watching downloaded Bilibili videos on macOS with native players like IINA.\n2. Converting large danmaku files (50k+ entries) without server-side lag.\n3. Customizing danmaku transparency and size for better readability on 4K displays.\n4. Archiving live stream comments into permanent, searchable subtitle files.",
+      "faq": [
+        { "q": "Why use ASS instead of XML?", "a": "Most professional local players cannot render XML directly. ASS is a powerful subtitle format that supports the precise positioning and motion needed for scrolling danmaku." },
+        { "q": "How does collision avoidance work?", "a": "The tool assigns each danmaku to a specific 'track' (vertical lane). It calculates the speed and length of each string to ensure new comments don't catch up to or overlap with previous ones." },
+        { "q": "Is my data safe?", "a": "Yes. This tool runs entirely in your browser using TypeScript. Your XML files are never uploaded to any server." }
+      ]
+    },
+    "problems": [
+      "How to watch bilibili danmaku in IINA",
+      "Online xml to ass converter for mac",
+      "Bilibili danmaku overlapping fix",
+      "Convert dandanplay xml to ass subtitles",
+      "Best tool for local danmaku playback"
+    ],
+    "workflow": { "before": ["bilibili-video-downloader", "xml-formatter"], "after": ["iina-player", "video-subtitle-merger"] },
+    "searchIntents": {
+      "informational": ["how danmaku2ass works", "what is ass subtitle format", "bilibili xml structure explained"],
+      "navigational": ["danmaku2ass online tool", "bilibili to ass converter free", "danmaku generator"],
+      "transactional": ["convert xml to ass for vlc", "download ass danmaku", "minify xml danmaku files"]
+    },
+    "i18n": {
+      "ja": {
+        "name": "Danmaku2ASS 変換器 (Bilibili XML対応)",
+        "description": "BilibiliなどのXML弾幕を高品質なASS字幕に変換。IINAやVLCで、重なりのないスムーズな弾幕再生を実現します。",
+        "seo": {
+          "title": "Danmaku2ASS オンライン - XML弾幕を高品質なASS字幕へ変換 | AIStacker",
+          "description": "BilibiliのXML弾幕をASS形式に変換。スマートな衝突回避アルゴリズムを搭載し、ブラウザ上で安全かつ高速に処理します。"
+        }
+      },
+      "zh": {
+        "name": "弹幕 XML 转 ASS 工具 (Danmaku2ASS)",
+        "description": "高性能 XML 弹幕转 ASS 字幕工具。支持 B 站弹幕转换，内置智能防碰撞算法，完美适配 IINA、VLC 及 Movist。",
+        "seo": {
+          "title": "Danmaku2ASS 在线转换 - B 站 XML 弹幕转 ASS 字幕工具 | AIStacker",
+          "description": "在线将 B 站 XML 弹幕转换为 ASS 格式。支持智能防重叠、自定义字号与透明度，纯本地转换，保护隐私。"
+        }
+      }
+    }
+  },
+
+
+  
 ]
