@@ -23,5 +23,8 @@ export const toolRegistry: Record<string, React.ComponentType> = {
   JwtDecoder:         dynamic(() => import("@/components/tools/JwtDecoder")),
   HashGenerator:      dynamic(() => import("@/components/tools/HashGenerator")),
   ColorConverter:     dynamic(() => import("@/components/tools/ColorConverter")),
+  JsMinifier:         dynamic(() => import("@/components/tools/JsMinifier")),
+  Danmaku2ASS:        dynamic(() => import("@/components/tools/Danmaku2ASS")),
+
 }
   

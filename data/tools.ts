@@ -14,11 +14,11 @@ export type ToolCategory =
 export type ToolSubcategory =
   | "json" | "yaml" | "xml" | "csv"
   | "base64" | "url" | "html" | "jwt"
-  | "uuid" | "hash" | "password"
+  | "uuid" | "hash" | "password" | "danmaku2ass"
   | "regex" | "diff" | "lint" | "design"
   | "timestamp" | "timezone" | "color-space"
   | "markdown" | "unicode" | "word-count"
-  | "number-base" | "ip" | "dns" | "counter"
+  | "number-base" | "ip" | "dns" | "counter" | "javascript"
 
 export type ToolStatus = "stable" | "beta" | "new"
 export type Locale = "en" | "ja" | "zh"
@@ -995,6 +995,130 @@ export const tools: ToolMeta[] = [
     }
   },
 
+  {
+  "slug": "js-minifier-terser",
+  "name": "JS Minifier",
+  "description": "Enterprise-grade professional JavaScript compression tool powered by Terser Engine. Supports ES6+, variable mangling, and dead code elimination for production builds.",
+  "component": "JsMinifier",
+  "category": "tester",
+  "subcategory": "javascript",
+  "tags": [
+    "terser online", "js minifier production", "javascript obfuscator",
+    "es6 minifier", "mangle js online", "minify js terser", "uglify es",
+    "remove console logs online", "compress js for vite", "webpack minifier"
+  ],
+  "status": "stable",
+  "featured": true,
+  "addedAt": "2026-03-25",
+  "seo": {
+    "title": "Terser Online - Professional JavaScript Minification & Obfuscation",
+    "description": "Compress JavaScript with the industry-standard Terser engine. Supports ES6+, variable mangling, and removal of console logs. 100% secure, browser-side optimization."
+  },
+  "content": {
+    "intro": "Terser is the gold standard for JavaScript minification, used by Vite, Webpack, and Next.js. Unlike simple regex minifiers, Terser parses your code into an Abstract Syntax Tree (AST), enabling advanced optimizations like constant folding and dead code elimination.",
+    "usage": "Paste your code, select optimization flags like 'Mangle' to shrink variable names or 'Drop Console' to clean up debugging logs, then click 'Run Optimizer'. The engine will output high-performance, minified code suitable for production environments.",
+    "example": "Input:\nconst secret = '123';\nconsole.log(secret);\n\nOutput (Mangle ON, Drop Console ON):\nconst a='123';",
+    "useCases": "1. Compressing individual JS assets for small-scale projects.\n2. Obfuscating proprietary logic to prevent easy reverse engineering.\n3. Stripping debugging code (console.logs) before production releases.\n4. Quick testing of how specific Terser configurations affect your bundle size.",
+    "faq": [
+      { "q": "Is Mangle safe?", "a": "Yes. Mangle safely renames variables to single letters to save space. It avoids renaming global variables unless explicitly configured otherwise." },
+      { "q": "Does this support ES6?", "a": "Absolutely. This tool supports modern JavaScript syntax including arrow functions, classes, and async/await." },
+      { "q": "Why use Terser over simple compressors?", "a": "Terser performs deep analysis of your logic, removing code that is never reached and optimizing variable scopes, leading to much smaller and faster files." }
+    ]
+  },
+  "problems": [
+    "How to minify es6 javascript online",
+    "Online terser minifier with mangle",
+    "Remove console logs from js for production",
+    "How to obfuscate javascript variables safely",
+    "Best online tool for production js compression"
+  ],
+  "workflow": { "before": ["js-formatter", "babel-transpiler"], "after": ["gzip-tester", "subresource-integrity-generator"] },
+  "searchIntents": {
+    "informational": ["what is terser engine", "how mangle works in js", "dead code elimination explained"],
+    "navigational": ["terser online tool", "js minifier pro", "minify js using terser"],
+    "transactional": ["compress js for production", "obfuscate javascript online", "shrink js bundle size"]
+  },
+  "i18n": {
+    "ja": {
+      "name": "プロフェッショナル JS ミニファイア (Terser)",
+      "description": "Terserエンジンを搭載した企業レベルのJS圧縮ツール。ES6+対応、変数難読化、デッドコード削除をブラウザ上で実行。",
+      "seo": {
+        "title": "Terser オンライン - 高度なJavaScript圧縮と難読化 | AIStacker",
+        "description": "ViteやWebpackでも採用されているTerserでJSを最適化。ES6+、変数難読化、console.log削除に対応。"
+      }
+    },
+    "zh": {
+      "name": "专业级 JS 压缩器",
+      "description": "基于业界标准的 Terser 引擎，支持 ES6+、变量混淆、移除 Console 及无用代码剔除，专为生产环境构建。",
+      "seo": {
+        "title": "Terser 在线压缩 - 专业 JavaScript 混淆与优化工具 | AIStacker",
+        "description": "使用业界首选的 Terser 引擎在线压缩 JS。支持变量混淆、移除调试代码，完全本地处理，安全可靠。"
+      }
+    }
+  }
+},
+{
+  "slug": "danmaku-to-ass-converter",
+  "name": "Danmaku(XML) to ASS Converter",
+  "description": "High-performance XML to ASS subtitle converter. Transform Bilibili/AcFun danmaku into high-quality, collision-free subtitles for Potplayer, IINA, VLC, and Movist.",
+  "component": "Danmaku2ASS",
+  "category": "converter",
+  "subcategory": "danmaku2ass",
+  "tags": [
+    "danmaku2ass online", "xml to ass converter", "bilibili danmaku download",
+    "convert xml subtitles to ass", "danmaku for iina", "bilibili to ass converter",
+    "collision-free danmaku", "danmaku to vlc", "local danmaku parser", "ass subtitle generator"
+  ],
+  "status": "new",
+  "featured": true,
+  "addedAt": "2026-03-25",
+  "seo": {
+    "title": "Danmaku2ASS Online - Convert Bilibili XML to High-Quality Subtitles",
+    "description": "Convert Bilibili XML danmaku to ASS subtitles with smart collision avoidance. 100% browser-side processing, secure, and supports custom font sizes and opacity."
+  },
+  "content": {
+    "intro": "Danmaku2ASS is an essential tool for anime fans and video enthusiasts. It converts the proprietary XML danmaku format used by Bilibili into the universal ASS (Advanced Substation Alpha) format, allowing you to enjoy 'scrolling comments' in professional local players like IINA, VLC, or MPV.",
+    "usage": "Simply paste your XML content or upload the .xml file. Adjust settings such as 'Font Size' or 'Duration' to match your video resolution, then click 'Convert'. The tool uses a specialized track-based algorithm to ensure danmaku don't overlap, creating a clean viewing experience.",
+    "example": "Input (XML):\n<d p=\"12.5,1,25,16777215,... \">Hello World</d>\n\nOutput (ASS):\nDialogue: 0,00:00:12.50,00:00:20.50,Default,,{\\move(1920,50,-500,50)}Hello World",
+    "useCases": "1. Watching downloaded Bilibili videos on macOS with native players like IINA.\n2. Converting large danmaku files (50k+ entries) without server-side lag.\n3. Customizing danmaku transparency and size for better readability on 4K displays.\n4. Archiving live stream comments into permanent, searchable subtitle files.",
+    "faq": [
+      { "q": "Why use ASS instead of XML?", "a": "Most professional local players cannot render XML directly. ASS is a powerful subtitle format that supports the precise positioning and motion needed for scrolling danmaku." },
+      { "q": "How does collision avoidance work?", "a": "The tool assigns each danmaku to a specific 'track' (vertical lane). It calculates the speed and length of each string to ensure new comments don't catch up to or overlap with previous ones." },
+      { "q": "Is my data safe?", "a": "Yes. This tool runs entirely in your browser using TypeScript. Your XML files are never uploaded to any server." }
+    ]
+  },
+  "problems": [
+    "How to watch bilibili danmaku in IINA",
+    "Online xml to ass converter for mac",
+    "Bilibili danmaku overlapping fix",
+    "Convert dandanplay xml to ass subtitles",
+    "Best tool for local danmaku playback"
+  ],
+  "workflow": { "before": ["bilibili-video-downloader", "xml-formatter"], "after": ["iina-player", "video-subtitle-merger"] },
+  "searchIntents": {
+    "informational": ["how danmaku2ass works", "what is ass subtitle format", "bilibili xml structure explained"],
+    "navigational": ["danmaku2ass online tool", "bilibili to ass converter free", "danmaku generator"],
+    "transactional": ["convert xml to ass for vlc", "download ass danmaku", "minify xml danmaku files"]
+  },
+  "i18n": {
+    "ja": {
+      "name": "Danmaku2ASS 変換器",
+      "description": "BilibiliなどのXML弾幕を高品質なASS字幕に変換。 PotplayerやIINA、VLCなどで、重なりのないスムーズな弾幕再生を実現します。",
+      "seo": {
+        "title": "Danmaku2ASS オンライン - XML弾幕を高品質なASS字幕へ変換 | AIStacker",
+        "description": "BilibiliのXML弾幕をASS形式に変換。スマートな衝突回避アルゴリズムを搭載し、ブラウザ上で安全かつ高速に処理します。"
+      }
+    },
+    "zh": {
+      "name": "弹幕 XML 转 ASS 工具 (Danmaku2ASS)",
+      "description": "高性能 XML 弹幕转 ASS 字幕工具。支持 B 站弹幕转换，内置智能防碰撞算法，完美适配  Potplayer、IINA、VLC 及 Movist。",
+      "seo": {
+        "title": "Danmaku2ASS 在线转换 - B 站 XML 弹幕转 ASS 字幕工具 | AIStacker",
+        "description": "在线将 B 站 XML 弹幕转换为 ASS 格式。支持智能防重叠、自定义字号与透明度，纯本地转换，保护隐私。"
+      }
+    }
+  }
+}
 
 
 ]

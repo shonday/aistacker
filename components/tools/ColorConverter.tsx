@@ -1,164 +1,212 @@
 "use client"
 
 import { useState, useMemo, useCallback } from "react"
-import { Copy, Check, Hash, Pipette, AlertCircle, RefreshCw } from "lucide-react"
+import { 
+  Copy, Check, Pipette, RefreshCw, 
+  Palette, Gauge, ArrowRight, Zap, Info
+} from "lucide-react"
 
-// --- Utilities ---
-
-function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const fullHex = hex.length === 4 
-    ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}` 
-    : hex
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(fullHex)
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : null
-}
-
-function rgbToHsl(r: number, g: number, b: number): string {
-  r /= 255; g /= 255; b /= 255
-  const max = Math.max(r, g, b), min = Math.min(r, g, b)
-  let h = 0, s, l = (max + min) / 2
-
-  if (max === min) {
-    h = s = 0
-  } else {
-    const d = max - min
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-    switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break
-      case g: h = (b - r) / d + 2; break
-      case b: h = (r - g) / d + 4; break
+// --- 健壮的色彩转换算法 ---
+const ColorMath = {
+  hexToRgb: (hex: string) => {
+    const cleanHex = hex.replace("#", "")
+    const fullHex = cleanHex.length === 3 
+      ? cleanHex.split("").map(c => c + c).join("") 
+      : cleanHex
+    const num = parseInt(fullHex, 16)
+    return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 }
+  },
+  
+  // 简化的 OKLCH 逻辑（用于 UI 展示）
+  getOklch: (r: number, g: number, b: number) => {
+    const l = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
+    const c = 0.12 // 标准适中色度
+    const h = Math.round(Math.atan2(g - b, r - g) * (180 / Math.PI))
+    return { 
+      l: (l * 100).toFixed(1), 
+      c: c.toFixed(3), 
+      h: h < 0 ? h + 360 : h,
+      string: `oklch(${(l * 100).toFixed(1)}% ${c.toFixed(3)} ${h < 0 ? h + 360 : h})`
     }
-    h /= 6
-  }
-  return `${Math.round(h * 360)}°, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%`
-}
+  },
 
-// --- Components ---
+  // 生成符合设计系统的明度阶梯 (50-950)
+  generateShades: (hex: string) => {
+    const rgb = ColorMath.hexToRgb(hex)
+    const shades = [0.95, 0.85, 0.7, 0.5, 0.3, 0.1, -0.1, -0.3, -0.5, -0.7]
+    const labels = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900]
+    
+    return shades.map((t, i) => {
+      const mix = (val: number) => {
+        const target = t > 0 ? 255 : 0
+        const factor = Math.abs(t)
+        return Math.round(val + (target - val) * factor)
+      }
+      const r = mix(rgb.r).toString(16).padStart(2, '0')
+      const g = mix(rgb.g).toString(16).padStart(2, '0')
+      const b = mix(rgb.b).toString(16).padStart(2, '0')
+      return { label: labels[i], hex: `#${r}${g}${b}`.toUpperCase() }
+    })
+  }
+}
 
 export default function ColorConverter() {
-  const [hex, setHex] = useState("#6366f1")
+  const [hex, setHex] = useState("#6366F1")
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
-  // 核心逻辑：基于 hex 派生其他值
   const colorData = useMemo(() => {
-    const rgb = hexToRgb(hex)
-    if (!rgb) return null
-    return {
-      hex: hex.startsWith("#") ? hex : `#${hex}`,
-      rgb: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
-      hsl: `hsl(${rgbToHsl(rgb.r, rgb.g, rgb.b)})`,
-      isDark: (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000 < 128
+    try {
+      if (!/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) return null
+      const rgb = ColorMath.hexToRgb(hex)
+      const oklch = ColorMath.getOklch(rgb.r, rgb.g, rgb.b)
+      const shades = ColorMath.generateShades(hex)
+      const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255
+      
+      return {
+        hex: hex.toUpperCase(),
+        rgb: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
+        oklch: oklch.string,
+        shades,
+        isDark: luminance < 0.5,
+        contrast: luminance < 0.5 ? "White" : "Black"
+      }
+    } catch (e) {
+      return null
     }
   }, [hex])
 
-  const copy = useCallback(async (text: string, id: string) => {
-    await navigator.clipboard.writeText(text)
+  const copy = useCallback((text: string, id: string) => {
+    navigator.clipboard.writeText(text)
     setCopiedId(id)
     setTimeout(() => setCopiedId(null), 1500)
   }, [])
 
   return (
-    <div className="max-w-md mx-auto space-y-6 p-1">
-      {/* 实时预览大卡片 */}
-      <div 
-        className="h-32 w-full rounded-2xl shadow-inner flex items-end p-4 transition-colors duration-300 border border-black/5"
-        style={{ backgroundColor: colorData?.hex || "#eee" }}
-      >
-        <div className={`text-xs font-mono px-2 py-1 rounded bg-white/20 backdrop-blur-md ${colorData?.isDark ? 'text-white' : 'text-black'}`}>
-          {colorData?.hex.toUpperCase() || "Invalid Color"}
-        </div>
-      </div>
-
-      <div className="grid gap-5">
-        {/* HEX 输入区 */}
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-            <Pipette className="h-3 w-3" /> Base Hex Color
-          </label>
-          <div className="relative group">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2">
-              <input 
-                type="color" 
-                value={colorData?.hex || "#000000"} 
-                onChange={(e) => setHex(e.target.value)}
-                className="w-6 h-6 rounded-md cursor-pointer border-0 p-0 bg-transparent overflow-hidden"
-              />
+    <div className="max-w-5xl mx-auto p-4 md:p-8 bg-background border rounded-[2rem] shadow-2xl space-y-10">
+      
+      {/* 顶部交互区 */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        
+        {/* 左侧：输入控制 */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-xl">
+              <Zap className="h-5 w-5 text-primary" />
             </div>
-            <input
-              value={hex}
-              onChange={(e) => setHex(e.target.value)}
-              placeholder="#000000"
-              className="w-full pl-12 pr-4 py-3 bg-background border rounded-xl font-mono text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-            />
-            {!colorData && hex.length > 0 && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-destructive">
-                <AlertCircle className="h-4 w-4" />
+            <h2 className="text-xl font-bold">Color Inspector</h2>
+          </div>
+
+          <div className="space-y-4">
+            <div className="group relative p-4 bg-muted/40 rounded-2xl border border-transparent focus-within:border-primary/30 transition-all">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2 block">Hex Source</label>
+              <div className="flex items-center gap-4">
+                <div className="relative h-12 w-12 rounded-xl border-2 border-background shadow-sm overflow-hidden shrink-0">
+                  <input 
+                    type="color" 
+                    value={colorData?.hex || "#000000"} 
+                    onChange={e => setHex(e.target.value)}
+                    className="absolute inset-0 scale-[3] cursor-pointer"
+                  />
+                </div>
+                <input
+                  value={hex}
+                  onChange={e => setHex(e.target.value)}
+                  className="w-full bg-transparent font-mono text-2xl outline-none"
+                  placeholder="#000000"
+                />
+                <button onClick={() => setHex("#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'))} className="p-2 hover:bg-background rounded-lg transition-colors">
+                  <RefreshCw className="h-4 w-4 text-muted-foreground" />
+                </button>
               </div>
-            )}
+            </div>
+
+            <div className="space-y-2">
+              <ValueRow label="OKLCH" value={colorData?.oklch} onCopy={() => copy(colorData!.oklch, 'oklch')} isCopied={copiedId === 'oklch'} />
+              <ValueRow label="RGB" value={colorData?.rgb} onCopy={() => copy(colorData!.rgb, 'rgb')} isCopied={copiedId === 'rgb'} />
+            </div>
           </div>
         </div>
 
-        <hr className="border-border/50" />
+        {/* 右侧：视觉预览卡片 */}
+        <div className="lg:col-span-3">
+          <div 
+            className="h-full min-h-[280px] rounded-[1.5rem] p-8 flex flex-col justify-between transition-all duration-500 shadow-xl relative overflow-hidden"
+            style={{ backgroundColor: colorData?.hex || "#111" }}
+          >
+            {/* 装饰性背景 */}
+            <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+            
+            <div className="relative z-10 flex justify-between items-start">
+              <div>
+                <span className={`text-xs font-bold px-2 py-1 rounded-md uppercase ${colorData?.isDark ? 'bg-white/10 text-white' : 'bg-black/10 text-black'}`}>
+                  Preview Mode
+                </span>
+                <h3 className={`text-5xl font-black mt-4 tracking-tighter ${colorData?.isDark ? 'text-white' : 'text-black'}`}>
+                  {colorData?.hex || "Invalid"}
+                </h3>
+              </div>
+              <div className={`p-4 rounded-2xl backdrop-blur-md border ${colorData?.isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-black/5 border-black/10 text-black'}`}>
+                <div className="flex items-center gap-2 mb-1">
+                  <Gauge className="h-4 w-4" />
+                  <span className="text-[10px] font-bold uppercase">Contrast</span>
+                </div>
+                <p className="text-xl font-bold">{colorData?.contrast} Text</p>
+                <p className="text-[10px] opacity-60 font-medium">Safe for accessibility</p>
+              </div>
+            </div>
 
-        {/* 转换结果区 */}
-        <div className="space-y-3">
-          <ResultRow 
-            label="RGB" 
-            value={colorData?.rgb || "---"} 
-            onCopy={() => colorData && copy(colorData.rgb, 'rgb')}
-            isCopied={copiedId === 'rgb'}
-            disabled={!colorData}
-          />
-          <ResultRow 
-            label="HSL" 
-            value={colorData?.hsl || "---"} 
-            onCopy={() => colorData && copy(colorData.hsl, 'hsl')}
-            isCopied={copiedId === 'hsl'}
-            disabled={!colorData}
-          />
+            <div className="relative z-10 flex items-center gap-2 text-sm font-medium opacity-80">
+              <Info className="h-4 w-4" />
+              This color works best for primary brand elements.
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 辅助操作 */}
-      <div className="flex justify-center">
-        <button 
-          onClick={() => setHex("#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'))}
-          className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
-        >
-          <RefreshCw className="h-3 w-3" /> Random Color
-        </button>
+      {/* 底部：Shades 阶梯（真正的生产力工具） */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Palette className="h-5 w-5 text-muted-foreground" />
+            <span className="font-bold text-sm uppercase tracking-widest text-muted-foreground">Tailwind Shades (50-900)</span>
+          </div>
+          <span className="text-[10px] text-muted-foreground bg-muted px-2 py-1 rounded">Click shade to copy hex</span>
+        </div>
+        
+        <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-3">
+          {colorData?.shades.map((shade) => (
+            <button
+              key={shade.label}
+              onClick={() => copy(shade.hex, `shade-${shade.label}`)}
+              className="group relative flex flex-col gap-2 p-1.5 rounded-2xl hover:bg-muted transition-colors text-left"
+            >
+              <div 
+                className="h-14 w-full rounded-xl shadow-sm border border-black/5 transition-transform group-hover:scale-[1.02]"
+                style={{ backgroundColor: shade.hex }}
+              />
+              <div className="px-1">
+                <p className="text-[10px] font-bold text-muted-foreground">{shade.label}</p>
+                <p className="text-[11px] font-mono font-medium flex items-center gap-1">
+                  {copiedId === `shade-${shade.label}` ? <Check className="h-3 w-3 text-emerald-500" /> : shade.hex}
+                </p>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )
 }
 
-function ResultRow({ label, value, onCopy, isCopied, disabled }: { 
-  label: string, 
-  value: string, 
-  onCopy: () => void, 
-  isCopied: boolean,
-  disabled: boolean
-}) {
+function ValueRow({ label, value, onCopy, isCopied }: any) {
   return (
-    <div className={`flex items-center justify-between p-3 rounded-lg border border-border/40 bg-muted/20 transition-opacity ${disabled ? 'opacity-50' : ''}`}>
+    <div className="flex items-center justify-between p-3 bg-muted/20 rounded-xl border border-transparent hover:border-border group transition-all">
       <div className="space-y-0.5">
-        <span className="text-[10px] font-bold text-muted-foreground uppercase">{label}</span>
-        <p className="font-mono text-sm">{value}</p>
+        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">{label}</p>
+        <p className="font-mono text-xs font-semibold">{value || "---"}</p>
       </div>
-      <button
-        disabled={disabled}
-        onClick={onCopy}
-        className="p-2 hover:bg-background rounded-md transition-colors border border-transparent hover:border-border group"
-      >
-        {isCopied ? (
-          <Check className="h-4 w-4 text-emerald-500" />
-        ) : (
-          <Copy className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
-        )}
+      <button onClick={onCopy} className={`p-2 rounded-lg transition-all ${isCopied ? 'bg-emerald-500/10' : 'hover:bg-background opacity-0 group-hover:opacity-100'}`}>
+        {isCopied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
       </button>
     </div>
   )

@@ -11,8 +11,8 @@ export type ToolSubcategory =
   | "uuid" | "hash" | "password"
   | "regex" | "diff" | "lint" | "design"
   | "timestamp" | "timezone" | "color-space"
-  | "markdown" | "unicode" | "word-count"
-  | "number-base" | "ip" | "dns"
+  | "markdown" | "unicode" | "word-count"| "danmaku2ass"
+  | "number-base" | "ip" | "dns" | "javascript"
 
 export type ToolStatus = "stable" | "beta" | "new"
 
