@@ -90,7 +90,7 @@ const parseMarkdown = (source: string): string => {
     }
 
     const lines = block.split('\n');
-    let listType = /^\s*\d+\. /.test(lines[0]) ? "ol" : "ul";
+    const listType = /^\s*\d+\. /.test(lines[0]) ? "ol" : "ul";
     const listItems: string[] = [];
     let currentItemLines: string[] = [];
 

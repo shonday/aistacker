@@ -193,4 +193,106 @@ export const wave1Tools: ToolMeta[] = [
     }
   }
 },
+{
+  "slug": "number-base-converter",
+  "name": "Multi-Base Number Converter",
+  "description": "High-precision number system conversion tool. Instantly convert between Binary, Octal, Decimal, Hexadecimal, Base 32, and Base 36 with BigInt support.",
+  "component": "NumberBaseConverter",
+  "category": "converter",
+  "subcategory": "math",
+  "tags": [
+    "binary to decimal",
+    "hex to binary converter",
+    "base converter online",
+    "bigint converter",
+    "octal to hex",
+    "base 36 converter",
+    "arbitrary precision conversion",
+    "number system translator",
+    "programming math tools"
+  ],
+  "status": "new",
+  "featured": false,
+  "addedAt": "2026-03-25",
+  "seo": {
+    "title": "Number Base Converter - Binary, Hex, Decimal & BigInt Support",
+    "description": "Convert numbers between any base from 2 to 36. High-precision BigInt support ensures no data loss for large integers. Real-time, secure, and developer-friendly."
+  },
+  "content": {
+    "intro": "The Multi-Base Number Converter is a reactive engine designed for developers and students. Unlike standard calculators that fail at 53-bit integers, this tool utilizes JavaScript BigInt to handle massive numbers across Binary, Octal, Decimal, Hex, and higher bases up to 36.",
+    "usage": "Enter a value into any base field. All other fields will synchronize instantly. If an invalid character for a specific base is detected (e.g., 'A' in Decimal), the tool will provide immediate visual feedback.",
+    "example": "Input (Hex):\n0xDEADBEEF\n\nOutput (Binary):\n11011110101011011011111011101111",
+    "useCases": "1. Debugging memory addresses and flags in low-level programming.\n2. Converting UUIDs or large database IDs into different representations.\n3. Learning and practicing number system conversions for computer science.\n4. Quick hexadecimal to decimal translation for CSS or hardware offsets.",
+    "faq": [
+      {
+        "q": "Why use BigInt for conversion?",
+        "a": "Standard JavaScript numbers use 64-bit floats, which lose precision after 15-17 digits. BigInt allows for mathematically perfect conversion of integers of any size."
+      },
+      {
+        "q": "Does it support negative numbers?",
+        "a": "The current version focuses on unsigned integer representation (natural numbers). For signed conversion, standard two's complement logic can be applied to the binary output."
+      },
+      {
+        "q": "Is '0x' required for Hexadecimal?",
+        "a": "No. The tool automatically detects and strips common prefixes like '0x' or '0b' to ensure a smooth copy-paste experience."
+      }
+    ]
+  },
+  "problems": [
+    "How to convert large hex to decimal without precision loss",
+    "Binary to Hexadecimal converter for developers",
+    "Base 36 to Decimal online tool",
+    "Large integer number system converter",
+    "How to represent decimal as base 32"
+  ],
+  "workflow": {
+    "before": [
+      "js-minifier-terser",
+      "jwt-decoder"
+    ],
+    "after": [
+      "unit-converter",
+      "cron-job-parser"
+    ]
+  },
+  "searchIntents": {
+    "informational": [
+      "how binary conversion works",
+      "what is base 36 used for",
+      "bigint vs number precision"
+    ],
+    "navigational": [
+      "base converter tool",
+      "binary hex translator",
+      "hex to dec calculator"
+    ],
+    "transactional": [
+      "convert binary to decimal online",
+      "large number hex converter",
+      "synchronous base conversion"
+    ]
+  },
+  "i18n": {
+    "ja": {
+      "name": "進数変換ツール (Binary/Hex/BigInt対応)",
+      "description": "高精度な進数変換エンジン。2進数、8進数、10進数、16進数、Base36間をリアルタイムで相互変換。BigInt採用で桁落ちなし。",
+      "seo": {
+        "title": "進数変換ツール - 2進数・16進数・10進数を高精度変換 | AIStacker",
+        "description": "あらゆる基数（2〜36進数）に対応した変換ツール。BigIntのサポートにより、巨大な数値でも精度を落とさずに変換可能です。"
+      }
+    },
+    "zh": {
+      "name": "多进制转换器 (支持大数字 BigInt)",
+      "description": "高性能进制转换引擎。支持二进制、八进制、十进制、十六进制及最高 36 进制实时转换，支持大数运算不丢失精度。",
+      "seo": {
+        "title": "在线进制转换器 - 支持二进制、十六进制及大数 BigInt 转换 | AIStacker",
+        "description": "在 2 到 36 进制之间进行实时数值转换。采用 BigInt 技术，确保长数字转换无精度损失。开发者必备的高效率工具。"
+      }
+    }
+  }
+},
+
+
+
+
 ]

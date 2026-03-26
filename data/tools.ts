@@ -13,7 +13,7 @@ export type ToolCategory =
 
 export type ToolSubcategory =
   | "json" | "yaml" | "xml" | "csv"
-  | "base64" | "url" | "html" | "jwt"
+  | "base64" | "url" | "html" | "jwt" | "math"
   | "uuid" | "hash" | "password" | "danmaku2ass"
   | "regex" | "diff" | "lint" | "design"
   | "timestamp" | "timezone" | "color-space"
@@ -1118,7 +1118,168 @@ export const tools: ToolMeta[] = [
       }
     }
   }
-}
+},
+{
+  "slug": "number-base-converter",
+  "name": "Multi-Base Number Converter",
+  "description": "High-precision number system conversion tool. Instantly convert between Binary, Octal, Decimal, Hexadecimal, Base 32, and Base 36 with BigInt support.",
+  "component": "NumberBaseConverter",
+  "category": "converter",
+  "subcategory": "math",
+  "tags": [
+    "binary to decimal",
+    "hex to binary converter",
+    "base converter online",
+    "bigint converter",
+    "octal to hex",
+    "base 36 converter",
+    "arbitrary precision conversion",
+    "number system translator",
+    "programming math tools"
+  ],
+  "status": "new",
+  "featured": false,
+  "addedAt": "2026-03-25",
+  "seo": {
+    "title": "Number Base Converter - Binary, Hex, Decimal & BigInt Support",
+    "description": "Convert numbers between any base from 2 to 36. High-precision BigInt support ensures no data loss for large integers. Real-time, secure, and developer-friendly."
+  },
+  "content": {
+    "intro": "The Multi-Base Number Converter is a reactive engine designed for developers and students. Unlike standard calculators that fail at 53-bit integers, this tool utilizes JavaScript BigInt to handle massive numbers across Binary, Octal, Decimal, Hex, and higher bases up to 36.",
+    "usage": "Enter a value into any base field. All other fields will synchronize instantly. If an invalid character for a specific base is detected (e.g., 'A' in Decimal), the tool will provide immediate visual feedback.",
+    "example": "Input (Hex):\n0xDEADBEEF\n\nOutput (Binary):\n11011110101011011011111011101111",
+    "useCases": "1. Debugging memory addresses and flags in low-level programming.\n2. Converting UUIDs or large database IDs into different representations.\n3. Learning and practicing number system conversions for computer science.\n4. Quick hexadecimal to decimal translation for CSS or hardware offsets.",
+    "faq": [
+      {
+        "q": "Why use BigInt for conversion?",
+        "a": "Standard JavaScript numbers use 64-bit floats, which lose precision after 15-17 digits. BigInt allows for mathematically perfect conversion of integers of any size."
+      },
+      {
+        "q": "Does it support negative numbers?",
+        "a": "The current version focuses on unsigned integer representation (natural numbers). For signed conversion, standard two's complement logic can be applied to the binary output."
+      },
+      {
+        "q": "Is '0x' required for Hexadecimal?",
+        "a": "No. The tool automatically detects and strips common prefixes like '0x' or '0b' to ensure a smooth copy-paste experience."
+      }
+    ]
+  },
+  "problems": [
+    "How to convert large hex to decimal without precision loss",
+    "Binary to Hexadecimal converter for developers",
+    "Base 36 to Decimal online tool",
+    "Large integer number system converter",
+    "How to represent decimal as base 32"
+  ],
+  "workflow": {
+    "before": [
+      "js-minifier-terser",
+      "jwt-decoder"
+    ],
+    "after": [
+      "unit-converter",
+      "cron-job-parser"
+    ]
+  },
+  "searchIntents": {
+    "informational": [
+      "how binary conversion works",
+      "what is base 36 used for",
+      "bigint vs number precision"
+    ],
+    "navigational": [
+      "base converter tool",
+      "binary hex translator",
+      "hex to dec calculator"
+    ],
+    "transactional": [
+      "convert binary to decimal online",
+      "large number hex converter",
+      "synchronous base conversion"
+    ]
+  },
+  "i18n": {
+    "ja": {
+      "name": "進数変換ツール (Binary/Hex/BigInt対応)",
+      "description": "高精度な進数変換エンジン。2進数、8進数、10進数、16進数、Base36間をリアルタイムで相互変換。BigInt採用で桁落ちなし。",
+      "seo": {
+        "title": "進数変換ツール - 2進数・16進数・10進数を高精度変換 | AIStacker",
+        "description": "あらゆる基数（2〜36進数）に対応した変換ツール。BigIntのサポートにより、巨大な数値でも精度を落とさずに変換可能です。"
+      }
+    },
+    "zh": {
+      "name": "多进制转换器 (支持大数字 BigInt)",
+      "description": "高性能进制转换引擎。支持二进制、八进制、十进制、十六进制及最高 36 进制实时转换，支持大数运算不丢失精度。",
+      "seo": {
+        "title": "在线进制转换器 - 支持二进制、十六进制及大数 BigInt 转换 | AIStacker",
+        "description": "在 2 到 36 进制之间进行实时数值转换。采用 BigInt 技术，确保长数字转换无精度损失。开发者必备的高效率工具。"
+      }
+    }
+  }
+},
+{
+  "slug": "text-diff-checker",
+  "name": "Diff Checker",
+  "description": "Compare two text documents to find differences instantly. Features precise line, word, and character-level diffing with a GitHub-style unified view.",
+  "component": "DiffChecker",
+  "category": "formatter",
+  "subcategory": "diff",
+  "tags": [
+    "diff checker", "text compare online", "compare strings", "git diff online",
+    "find differences in text", "code compare", "difference tool",
+    "line diff", "word diff", "json diff checker"
+  ],
+  "status": "stable",
+  "featured": true,
+  "addedAt": "2026-03-27",
+  "seo": {
+    "title": "Text Diff Checker Online - Compare Code & Text Differences",
+    "description": "Instantly compare two text or code files to highlight differences. Supports line-by-line, word, and character level diffing. 100% secure, browser-side processing."
+  },
+  "content": {
+    "intro": "The Diff Checker is a robust utility that compares the 'Original Text' and 'Modified Text' to detect modifications. Using an advanced difference algorithm, it highlights insertions in green and deletions in red, generating a unified diff view identical to what you see in GitHub or VS Code.",
+    "usage": "Paste your original text into the left panel and the modified text into the right panel. Choose your preferred comparison granularity (Lines, Words, or Chars), toggle options like 'Ignore Whitespace', and click 'Compare Texts' to see the exact changes.",
+    "example": "Original: 'The quick brown fox jumps over the lazy dog.'\nModified: 'The fast brown fox jumps over the lazy cat.'\nResult: The tool will highlight 'quick' and 'dog' as deletions, and 'fast' and 'cat' as additions.",
+    "useCases": "1. Comparing two versions of a source code file to track undocumented changes.\n2. Reviewing edits made to an essay, article, or legal document.\n3. Checking JSON files to spot missing keys or altered values.\n4. Verifying configuration file changes before server deployment.",
+    "faq": [
+      { "q": "Are my files uploaded to your servers?", "a": "No. The entire comparison process is executed locally in your browser via JavaScript. Your sensitive text or code never leaves your device." },
+      { "q": "What is the difference between Line, Word, and Char modes?", "a": "Line mode compares text block-by-block (best for code). Word mode isolates changes down to specific words in a sentence (best for prose). Char mode highlights exact character swaps (best for finding subtle typos)." },
+      { "q": "Can it handle large files?", "a": "Yes, the JsDiff engine is highly optimized. However, comparing files with tens of thousands of lines in the browser may cause temporary UI freezing." }
+    ]
+  },
+  "problems": [
+    "How to compare two text files online",
+    "Find differences between two strings",
+    "Online git diff viewer",
+    "Tool to see what changed in code",
+    "Compare json text online"
+  ],
+  "workflow": { "before": ["json-formatter", "base64-decode"], "after": ["string-manipulator"] },
+  "searchIntents": {
+    "informational": ["how diff algorithm works", "git diff explained", "what is unified diff"],
+    "navigational": ["diff checker online", "text compare tool", "code difference checker"],
+    "transactional": ["compare text online free", "find text differences locally", "diff two code snippets"]
+  },
+  "i18n": {
+    "ja": {
+      "name": "差分チェッカー (Diff Checker)",
+      "description": "2つのテキストの差分を瞬時に検出します。行、単語、文字レベルの正確な比較と、GitHubスタイルの差分表示に対応しています。",
+      "seo": {
+        "title": "差分チェッカー - テキスト・コード比較ツール | AIStacker",
+        "description": "2つのテキストを比較し、追加・削除された箇所をハイライト表示。完全ブラウザ処理で安全にコードや文章の変更点を確認できます。"
+      }
+    },
+    "zh": {
+      "name": "文本差异比对 (Diff Checker)",
+      "description": "即时比对两段文本或代码，精准找出差异。支持按行、按词、按字符粒度进行比对，并提供类似 GitHub 的差异高亮视图。",
+      "seo": {
+        "title": "在线差异比对工具 - 文本与代码比对 | AIStacker",
+        "description": "在线对比两段文本或代码的不同之处。支持过滤空格与大小写，提供精准的新增与删除高亮。完全本地运算，保护您的数据隐私。"
+      }
+    }
+  }
+},
+
 
 
 ]
