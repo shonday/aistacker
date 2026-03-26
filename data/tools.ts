@@ -15,7 +15,7 @@ export type ToolSubcategory =
   | "json" | "yaml" | "xml" | "csv"
   | "base64" | "url" | "html" | "jwt" | "math"
   | "uuid" | "hash" | "password" | "danmaku2ass"
-  | "regex" | "diff" | "lint" | "design"
+  | "regex" | "diff" | "lint" | "design" | "data"
   | "timestamp" | "timezone" | "color-space"
   | "markdown" | "unicode" | "word-count"
   | "number-base" | "ip" | "dns" | "counter" | "javascript"
@@ -1275,6 +1275,130 @@ export const tools: ToolMeta[] = [
       "seo": {
         "title": "在线差异比对工具 - 文本与代码比对 | AIStacker",
         "description": "在线对比两段文本或代码的不同之处。支持过滤空格与大小写，提供精准的新增与删除高亮。完全本地运算，保护您的数据隐私。"
+      }
+    }
+  }
+},
+{
+  "slug": "yaml-formatter",
+  "name": "YAML Formatter & Validator",
+  "description": "Strictly format, validate, and beautify your YAML configurations. Instantly detect syntax errors with line-level precision. Essential for Docker and Kubernetes.",
+  "component": "YamlFormatter",
+  "category": "formatter",
+  "subcategory": "data",
+  "tags": [
+    "yaml formatter", "yaml validator", "check yaml syntax", "yaml to json",
+    "format docker compose", "k8s yaml validator", "online yaml tool",
+    "yaml prettifier", "fix yaml indentation", "strict yaml parser"
+  ],
+  "status": "stable",
+  "featured": true,
+  "addedAt": "2026-03-27",
+  "seo": {
+    "title": "YAML Formatter & Validator Online - Check Syntax & Beautify",
+    "description": "Free online YAML formatter and validator. Fix indentation issues, check syntax errors, and format Docker Compose or Kubernetes configurations securely in your browser."
+  },
+  "content": {
+    "intro": "YAML (YAML Ain't Markup Language) is the standard for configuration files, widely used in Docker, Kubernetes, and CI/CD pipelines. However, its strict reliance on indentation makes it prone to syntax errors. This tool uses the industry-standard `js-yaml` engine to parse, validate, and reformat your code instantly.",
+    "usage": "Paste your raw YAML or JSON into the input area. Choose your preferred indentation (2 or 4 spaces) and whether to sort keys alphabetically. Click 'Format & Validate'. If there is a syntax error, the tool will highlight the exact line and column where the parsing failed.",
+    "example": "Input:\nserver:\n  port: 8080\nenvironment:   production\n\nOutput (2 Spaces):\nserver:\n  port: 8080\nenvironment: production",
+    "useCases": "1. Validating Kubernetes deployment files (.yaml) before applying them to a cluster.\n2. Beautifying messy or minified Docker Compose configurations.\n3. Converting standard JSON API responses into readable YAML formats.\n4. Alphabetizing massive configuration files for easier manual reading.",
+    "faq": [
+      { "q": "Is my YAML configuration secure?", "a": "Absolutely. Your data is parsed and formatted entirely within your browser's memory using a local JavaScript engine. We do not track or store your input." },
+      { "q": "Can I convert JSON to YAML with this?", "a": "Yes. Since JSON is technically a valid subset of YAML, pasting JSON into the input will format it cleanly into YAML." },
+      { "q": "Why does my YAML fail validation?", "a": "The most common YAML errors include mixing tabs and spaces for indentation, forgetting spaces after colons, or unescaped special characters in strings. The validator will point you to the exact character causing the issue." }
+    ]
+  },
+  "problems": [
+    "How to check if yaml is valid online",
+    "Format kubernetes yaml file",
+    "Convert json to yaml online",
+    "Fix yaml indentation error",
+    "Online yaml syntax checker tool"
+  ],
+  "workflow": { "before": ["json-formatter"], "after": ["base64-encode"] },
+  "searchIntents": {
+    "informational": ["why does yaml use spaces not tabs", "yaml vs json", "how to write docker compose yaml"],
+    "navigational": ["yaml validator", "yaml formatter online", "js-yaml online tool"],
+    "transactional": ["validate k8s yaml file", "format yaml 2 spaces", "fix yaml syntax error"]
+  },
+  "i18n": {
+    "ja": {
+      "name": "YAML フォーマッター＆バリデーター",
+      "description": "YAML設定ファイルのフォーマット、構文チェック、整形を厳密に行います。DockerやKubernetesのエラー検出に最適です。",
+      "seo": {
+        "title": "YAML フォーマッター＆構文チェックツール | AIStacker",
+        "description": "インデントの修正、構文エラーの検証、Docker/K8s設定のフォーマットをブラウザ上で安全に実行します。"
+      }
+    },
+    "zh": {
+      "name": "YAML 格式化与验证器",
+      "description": "严格格式化、验证并美化您的 YAML 配置文件。精准定位语法错误到具体行与列，Docker 与 K8s 开发者的必备工具。",
+      "seo": {
+        "title": "YAML 格式化与在线验证工具 - 语法检查 | AIStacker",
+        "description": "免费的在线 YAML 格式化工具。修复缩进问题、检查语法错误，安全高效地处理 Docker Compose 和 Kubernetes 配置文件。"
+      }
+    }
+  }
+},
+{
+  "slug": "csv-json-converter",
+  "name": "CSV ↔ JSON Converter",
+  "description": "Enterprise-grade bidirectional data converter. Instantly transform CSV to JSON, or JSON to CSV using the robust PapaParse engine. Handles large data sets safely in your browser.",
+  "component": "CsvJsonConverter",
+  "category": "converter",
+  "subcategory": "data",
+  "tags": [
+    "csv to json", "json to csv", "convert csv online", "convert json to excel",
+    "csv parser", "json array to csv", "papaparse online", "data converter",
+    "excel to json", "format csv file"
+  ],
+  "status": "stable",
+  "featured": true,
+  "addedAt": "2026-03-27",
+  "seo": {
+    "title": "CSV to JSON / JSON to CSV Converter Online - Secure Data Tool",
+    "description": "Bidirectional converter to seamlessly transform CSV files into structured JSON or flatten JSON arrays into CSV formats. Completely free, local browser processing."
+  },
+  "content": {
+    "intro": "Converting tabular data (CSV) into structured data (JSON) and vice-versa is a daily task for developers, data analysts, and system administrators. This tool leverages the industry-standard `PapaParse` engine, ensuring reliable parsing even when your CSV contains complex nested quotes, line breaks within cells, or malformed rows.",
+    "usage": "Select your desired conversion mode using the toggle button. Paste your data into the input pane on the left. Adjust the configuration (like treating the first row as Headers, or Pretty Printing the JSON output), then click 'Convert'. Your parsed data will instantly appear in the output pane, alongside statistical insights like record and column counts.",
+    "example": "CSV Input:\nname,age\nAlice,30\n\nJSON Output:\n[\n  {\n    \"name\": \"Alice\",\n    \"age\": \"30\"\n  }\n]",
+    "useCases": "1. Data Migration: Converting database exports (CSV) into JSON payloads for REST API requests.\n2. Reporting: Transforming complex JSON API responses into CSV format to be opened in Excel or Google Sheets.\n3. Configuration: Bridging the gap between legacy systems that output CSV and modern web applications that consume JSON.",
+    "faq": [
+      { "q": "Is my data uploaded to a server?", "a": "No. The entire parsing and unparsing process runs locally in your browser's memory using JavaScript. Your sensitive corporate or personal data remains completely private." },
+      { "q": "Can it handle missing or empty fields?", "a": "Yes. The underlying PapaParse engine is configured to be 'greedy' with empty lines (skipping trailing blanks) but preserves missing cell data accurately based on your headers." },
+      { "q": "What happens if my JSON is nested?", "a": "If you convert deeply nested JSON objects into CSV, the tool will attempt to flatten them or stringify nested structures. For best CSV results, provide an array of flat objects." }
+    ]
+  },
+  "problems": [
+    "How to convert csv to json object array",
+    "Online tool to change json to csv",
+    "Convert excel data to json format",
+    "Parse complex csv with quotes online",
+    "Safely convert json API response to csv"
+  ],
+  "workflow": { "before": ["json-formatter", "yaml-formatter"], "after": ["url-encoder"] },
+  "searchIntents": {
+    "informational": ["how to map csv to json", "what is papaparse", "json array vs csv"],
+    "navigational": ["csv to json online", "json to csv converter", "papaparse testing tool"],
+    "transactional": ["convert csv to json format securely", "export json to excel csv free", "transform database csv to json payload"]
+  },
+  "i18n": {
+    "ja": {
+      "name": "CSV ↔ JSON 変換ツール",
+      "description": "企業レベルの双方向データコンバーター。堅牢なPapaParseエンジンを使用し、CSVからJSON、またはJSONからCSVへ瞬時に変換します。",
+      "seo": {
+        "title": "CSV ↔ JSON コンバーター | 安全なブラウザ内データ変換 | AIStacker",
+        "description": "CSVファイルとJSON配列を双方向に変換する無料ツール。ExcelデータのAPIペイロード化や、APIレスポンスのCSV化に最適です。"
+      }
+    },
+    "zh": {
+      "name": "CSV ↔ JSON 双向转换器",
+      "description": "企业级双向数据转换工具。基于强大的 PapaParse 引擎，支持瞬间将 CSV 转为 JSON，或将 JSON 展平为 CSV。",
+      "seo": {
+        "title": "CSV 转 JSON / JSON 转 CSV 在线转换器 | 纯本地处理 | AIStacker",
+        "description": "免费的双向数据转换工具。轻松将 Excel/CSV 导出文件转换为 JSON 接口数据，或将 JSON 数组转为 CSV 表格。完全在浏览器端运行，确保数据隐私。"
       }
     }
   }

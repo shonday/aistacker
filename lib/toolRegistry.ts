@@ -27,6 +27,12 @@ export const toolRegistry: Record<string, React.ComponentType> = {
   Danmaku2ASS:          dynamic(() => import("@/components/tools/Danmaku2ASS")),
   NumberBaseConverter:  dynamic(() => import("@/components/tools/NumberBaseConverter")),
   DiffChecker:          dynamic(() => import("@/components/tools/DiffChecker")),
+  YamlFormatter:        dynamic(() => import("@/components/tools/YamlFormatter")),
+  CsvJsonConverter:     dynamic(() => import("@/components/tools/CsvJsonConverter")),
+
+
+
+
 
 }
   
