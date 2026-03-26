@@ -8,7 +8,7 @@ export type ToolCategory =
 export type ToolSubcategory =
   | "json" | "yaml" | "xml" | "csv"
   | "base64" | "url" | "html" | "jwt"
-  | "uuid" | "hash" | "password"
+  | "uuid" | "hash" | "password" | "math"
   | "regex" | "diff" | "lint" | "design"
   | "timestamp" | "timezone" | "color-space"
   | "markdown" | "unicode" | "word-count"| "danmaku2ass"
