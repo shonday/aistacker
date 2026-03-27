@@ -9,6 +9,7 @@ import { siteConfig }     from "@/lib/config"
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
 
+// 1. 更新 Metadata：添加多语言 alternate 链接
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
@@ -21,38 +22,48 @@ export const metadata: Metadata = {
   openGraph: { type: "website", siteName: siteConfig.name, locale: "en_US" },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
-  alternates: { canonical: siteConfig.url },
+  alternates: { 
+    canonical: siteConfig.url,
+    // 关键：告诉爬虫这里有三个版本的入口
+    languages: {
+      en: siteConfig.url,
+      ja: `${siteConfig.url}/ja`,
+      zh: `${siteConfig.url}/zh`,
+      "x-default": siteConfig.url,
+    },
+  },
 }
 
-// ── FOUC Prevention Script ────────────────────────────────────────────────────
-// This runs synchronously before any CSS or React hydration, so the correct
-// theme class is on <html> from the very first paint. Without this, the page
-// renders white for ~100ms before ThemeProvider hydrates.
-//
-// It reads localStorage and applies class="dark" if:
-//   - user explicitly set "dark"
-//   - user set "system" (or nothing) AND OS prefers dark
-//
-// dangerouslySetInnerHTML is intentional here — this must be a raw inline script.
-const themeScript = `
+// 2. 增强型初始化脚本：主题控制 + 极速重定向
+const initScript = `
 (function() {
   try {
+    // --- 主题控制逻辑 ---
     var stored = localStorage.getItem('aistacker-theme');
     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     var isDark = stored === 'dark' || (!stored && prefersDark) || (stored === 'system' && prefersDark);
     if (isDark) document.documentElement.classList.add('dark');
+
+    // --- 极速重定向逻辑 (针对 0 Middleware 方案优化) ---
+    // 只在根路径执行，避免干扰其他页面
+    if (window.location.pathname === '/') {
+      var lang = navigator.language.toLowerCase();
+      if (lang.startsWith('zh')) {
+        window.location.replace('/zh');
+      } else if (lang.startsWith('ja')) {
+        window.location.replace('/ja');
+      }
+    }
   } catch (e) {}
 })();
 `.trim()
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // suppressHydrationWarning prevents React's mismatch warning when
-    // ThemeProvider toggles the `dark` class on <html> after hydration.
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Must be the FIRST thing in <head> — before any stylesheet */}
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        {/* 这一段脚本是 0 Functions 请求架构下的“灵魂” */}
+        <script dangerouslySetInnerHTML={{ __html: initScript }} />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-background text-foreground`}>
         <ThemeProvider defaultTheme="system" storageKey="aistacker-theme">

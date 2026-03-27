@@ -1,38 +1,59 @@
-import Link               from "next/link"
-import { ArrowRight }     from "lucide-react"
+"use client" // 必须放在第一行
+
+import { useEffect, useState } from "react"
+import Link from "next/link"
+import { ArrowRight } from "lucide-react"
+
+// 注意：确保这些 data 函数不依赖 Node.js 原生 API (如 fs)，否则在客户端会报错
+// 如果它们只是纯 JS 对象，则完全没问题
 import {
   getFeaturedTools,
   getCategories,
   getToolsByCategory,
   CATEGORY_LABELS,
-}                         from "@/data/tools"
+} from "@/data/tools"
 import { getFeaturedGuides } from "@/data/guides"
-import { ToolCard }       from "@/components/layout/ToolCard"
-import { getMessages }    from "@/lib/i18n"
-import { siteConfig }     from "@/lib/config"
-import type { Metadata }  from "next"
-
-export const metadata: Metadata = {
-  alternates: {
-    canonical: siteConfig.url,
-    languages: {
-      en:          siteConfig.url,
-      ja:          `${siteConfig.url}/ja`,
-      zh:          `${siteConfig.url}/zh`,
-      "x-default": siteConfig.url,
-    },
-  },
-}
+import { ToolCard } from "@/components/layout/ToolCard"
+import { getMessages } from "@/lib/i18n"
 
 export default function HomePage() {
-  const t          = getMessages("en")
-  const featured   = getFeaturedTools()
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    // 1. 获取浏览器语言
+    const lang = navigator.language.toLowerCase()
+
+    // 2. 执行跳转逻辑
+    // 使用 window.location.replace 而不是 router.push，
+    // 这样用户点击“后退”时不会跳回这个重定向页，体验更好。
+    if (lang.startsWith("zh")) {
+      window.location.replace("/zh")
+      return
+    }
+    if (lang.startsWith("ja")) {
+      window.location.replace("/ja")
+      return
+    }
+
+    // 3. 如果是英文用户（或其他语言），停止加载状态，渲染 EN 内容
+    setReady(true)
+  }, [])
+
+  // 4. 数据获取（在客户端执行，逻辑与你原版一致）
+  const t = getMessages("en")
+  const featured = getFeaturedTools()
   const categories = getCategories()
-  const guides     = getFeaturedGuides()
+  const guides = getFeaturedGuides()
+
+  // 关键：在检测完成前返回 null 或骨架屏，防止“中文用户看到 0.1s 英文首页”的闪烁
+  if (!ready) {
+    return (
+      <div className="fixed inset-0 bg-background" /> // 干净的白屏或加载动画
+    )
+  }
 
   return (
     <div className="flex flex-col gap-20 pb-24">
-
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <section className="border-b border-border/50 bg-gradient-to-b from-muted/40 to-background px-6 py-20 text-center">
         <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
