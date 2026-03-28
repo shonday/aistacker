@@ -68,7 +68,7 @@ export function SiteFooter() {
           </div>
 
           {/* Center Info */}
-          <p className="hidden max-w-[300px] text-center text-xs leading-relaxed sm:block">
+          <p className="hidden max-w-[350px] text-center text-xs leading-relaxed sm:block">
             All tools run locally in your browser. No data leaves your device.
           </p>
 

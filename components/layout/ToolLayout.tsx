@@ -66,8 +66,8 @@ export default function ToolLayout({
         </div>
       </header>
 
-      {/* ── Tool component ────────────────────────────────────────── */}
-      <section className="mb-12 rounded-xl border border-border/60 bg-card p-5 shadow-sm sm:p-8">
+      {/* ── Tool component ────── rounded-sm border border-border/60─────p-5  xl:p-8 max-sm:p-1─────────────────────────────── */}
+      <section className="mb-12 bg-card ">
         {toolComponent ?? (
           <div className="flex min-h-[200px] items-center justify-center text-muted-foreground">
             Component coming soon.

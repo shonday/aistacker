@@ -9,10 +9,11 @@
 export type ToolCategory =
   | "formatter" | "encoder" | "generator" | "tester"
   | "converter" | "japanese" | "text" | "number"
-  | "color" | "image" | "network" | "crypto"
+  | "color" | "compressor" | "network" | "crypto"
+  | "image"
 
 export type ToolSubcategory =
-  | "json" | "yaml" | "xml" | "csv"
+  | "json" | "yaml" | "xml" | "csv" | "image"
   | "base64" | "url" | "html" | "jwt" | "math"
   | "uuid" | "hash" | "password" | "danmaku2ass"
   | "regex" | "diff" | "lint" | "design" | "data"
@@ -1403,8 +1404,161 @@ export const tools: ToolMeta[] = [
     }
   }
 },
-
-
+{
+  "slug": "image-compressor",
+  "name": "Smart Image Optimizer - Compress & Convert",
+  "description": "High-performance browser-based PNG, JPG, WebP image compression. Reduce file size by up to 90% without losing quality. No upload required, 100% private.",
+  "component": "ImageCompressor",
+  "category": "compressor",
+  "subcategory": "image",
+  "tags": [
+    "image compressor", "reduce image size", "webp converter", "browser compression",
+    "optimize photos for web", "convert to webp online", "compress png without quality loss",
+    "jpeg optimizer", "client-side image tool", "page speed optimizer"
+  ],
+  "status": "stable",
+  "featured": true,
+  "addedAt": "2026-03-27",
+  "seo": {
+    "title": "Smart Image Optimizer Online - Compress & Convert to WebP",
+    "description": "Free online image compressor. Reduce file sizes locally in your browser. Convert PNG/JPG to WebP and optimize images for faster page loading speeds without uploading data."
+  },
+  "content": {
+    "intro": "Image optimization is a critical factor for web performance (LCP) and SEO. This tool uses advanced client-side compression algorithms to shrink your image files while preserving visual quality. By leveraging Web Workers, the heavy lifting happens in the background, ensuring a smooth experience without data ever leaving your device.",
+    "usage": "Drag and drop your image (PNG, JPG, WebP) into the upload zone. Use the sliders to adjust the target file size (MB) and quality percentage. Select a maximum dimension if you need to resize. Click 'Optimize Image' to process and then download your results instantly.",
+    "example": "Input: 4.2MB PNG (3840x2160)\nSettings: 0.5MB Max / 0.8 Quality / 1920px\nOutput: 420KB WebP (1920x1080) - 90% Reduced",
+    "useCases": "1. Improving Google PageSpeed Insights scores by reducing Largest Contentful Paint (LCP).\n2. Shrinking large photos for email attachments or slow network conditions.\n3. Batch-readying assets for blog posts, social media, or e-commerce listings.\n4. Converting legacy formats (PNG/JPG) to modern, efficient WebP standards.",
+    "faq": [
+      { "q": "Is my data safe?", "a": "Yes. This tool runs entirely in your browser using JavaScript. No images are uploaded to any server, making it 100% private and secure." },
+      { "q": "Why convert to WebP?", "a": "WebP provides superior compression, typically resulting in files 25-34% smaller than JPEG at comparable quality levels." },
+      { "q": "What is the max file size?", "a": "We recommend files under 20MB for the best browser performance, though larger files may work depending on your device's RAM." }
+    ]
+  },
+  "problems": [
+    "How to reduce image size without losing quality",
+    "Compress image for web performance",
+    "Convert png to webp online for free",
+    "Fix slow page load caused by large images",
+    "Online photo optimizer no upload"
+  ],
+  "workflow": { "before": ["image-to-base64"], "after": ["svg-optimizer"] },
+  "searchIntents": {
+    "informational": ["best image format for web", "how does image compression work", "webp vs jpeg comparison"],
+    "navigational": ["image optimizer online", "tinypng alternative", "browser based image compressor"],
+    "transactional": ["compress 5mb image to 1mb", "convert jpg to webp online", "optimize images for seo"]
+  },
+  "i18n": {
+    "ja": {
+      "name": "スマート画像オプティマイザー",
+      "description": "ブラウザ上で動作する高性能PNG/JPG/WebP画像圧縮ツール。画質を落とさずサイズを最大90%削減。サーバーへのアップロード不要でプライバシーも安心です。",
+      "seo": {
+        "title": "画像圧縮・WebP変換ツール | オンライン最適化 | AIStacker",
+        "description": "画像をブラウザ内で安全に圧縮。PNG/JPGをWebPに変換し、ページの読み込み速度を高速化します。データは送信されません。"
+      }
+    },
+    "zh": {
+      "name": "智能图像优化器",
+      "description": "基于浏览器的高性能PNG/JPG/WebP图片压缩工具。在不损失质量的前提下减少高达 90% 的文件体积。无需上传，100% 隐私保护。",
+      "seo": {
+        "title": "在线图片压缩与 WebP 转换工具 - 提升网页性能 | AIStacker",
+        "description": "免费的在线图片压缩工具。在本地浏览器中直接缩小文件体积。支持 PNG/JPG 转 WebP，提升网站加载速度且不泄露隐私。"
+      }
+    }
+  }
+},
+{
+  "slug": "batch-image-optimizer",
+  "name": "Batch Image Optimizer - Compress & Convert Images",
+  "description": "Batch compress, convert, and optimize images directly in your browser. Supports WebP, JPG, PNG with instant preview and download all at one click. No upload required.",
+  "component": "ImageCompressorAll",
+  "category": "compressor",
+  "subcategory": "image",
+  "tags": [
+    "image compressor",
+    "batch image optimizer",
+    "convert jpg to webp",
+    "compress png online",
+    "image size reducer",
+    "webp converter",
+    "optimize images for web",
+    "bulk image compression",
+    "image optimizer tool",
+    "reduce image file size"
+  ],
+  "status": "stable",
+  "featured": true,
+  "addedAt": "2026-03-28",
+  "seo": {
+    "title": "Image Optimizer Pro - Compress & Convert Images Online",
+    "description": "Free online image optimizer. Compress, resize, and convert images to WebP, JPG, or PNG in bulk. Fast, secure, and runs entirely in your browser."
+  },
+  "content": {
+    "intro": "Modern websites require optimized images for fast loading and better SEO. This tool provides a fully client-side solution to compress, resize, and convert images in bulk using browser-based processing. No files are uploaded, ensuring complete privacy and speed.",
+    "usage": "Drag and drop your images or click to upload. Adjust compression settings such as max size, quality, and resolution. Select output format (WebP recommended). Click 'Optimize All' to process images. Download individually.",
+    "example": "Input: 3MB JPG image\nSettings: WebP, Quality 75%\nOutput: 600KB WebP image with minimal quality loss",
+    "useCases": "1. Optimize images before uploading to websites for better SEO and performance.\n2. Convert large JPG/PNG files into WebP format for faster page loading.\n3. Batch compress images for blogs, e-commerce, or portfolios.\n4. Reduce image sizes for email attachments or storage saving.",
+    "faq": [
+      {
+        "q": "Are my images uploaded to a server?",
+        "a": "No. All processing is done locally in your browser. Your images never leave your device."
+      },
+      {
+        "q": "What is the best format for web images?",
+        "a": "WebP is generally recommended because it provides better compression with high quality compared to JPG and PNG."
+      },
+      {
+        "q": "Why is there a limit on the number of images?",
+        "a": "To prevent browser memory overload and ensure smooth performance, especially when processing large files."
+      }
+    ]
+  },
+  "problems": [
+    "compress image without losing quality",
+    "convert jpg to webp online",
+    "reduce image size for website",
+    "batch image compression tool",
+    "optimize images for seo"
+  ],
+  "workflow": {
+    "before": ["image-resizer"],
+    "after": ["base64-encode"]
+  },
+  "searchIntents": {
+    "informational": [
+      "what is webp format",
+      "how to reduce image size",
+      "best image format for website"
+    ],
+    "navigational": [
+      "image optimizer",
+      "compress image online",
+      "webp converter tool"
+    ],
+    "transactional": [
+      "compress images for website",
+      "convert images to webp bulk",
+      "reduce image size quickly"
+    ]
+  },
+  "i18n": {
+    "ja": {
+      "name": "画像最適化ツール（Image Optimizer Pro）",
+      "description": "画像をブラウザ内で圧縮・変換・最適化。WebP/JPG/PNG対応、バッチダウンロード可能。",
+      "seo": {
+        "title": "画像圧縮・変換ツール - WebP対応 | Image Optimizer Pro",
+        "description": "無料の画像最適化ツール。画像を圧縮・リサイズ・変換し、WebP形式で高速表示を実現。すべてブラウザ内で安全に処理。"
+      }
+    },
+    "zh": {
+      "name": "图片压缩与转换工具（Image Optimizer Pro）",
+      "description": "在浏览器中批量压缩、转换和优化图片。支持 WebP、JPG、PNG，并提供批量下载。",
+      "seo": {
+        "title": "图片压缩与转换工具 - 支持 WebP 批量优化",
+        "description": "免费在线图片优化工具。批量压缩、调整尺寸并转换为 WebP/JPG/PNG，无需上传，安全高效。"
+      }
+    }
+  }
+},
 
 ]
 
@@ -1481,6 +1635,7 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   image:      "Image",
   network:    "Network",
   crypto:     "Crypto",
+  compressor: "Compressor",
 }
 
 export const CATEGORY_ICON: Record<ToolCategory, string> = {
@@ -1496,4 +1651,5 @@ export const CATEGORY_ICON: Record<ToolCategory, string> = {
   image:      "ImageIcon",
   network:    "Globe",
   crypto:     "ShieldCheck",
+  compressor: "ArrowLeftRight",
 }
