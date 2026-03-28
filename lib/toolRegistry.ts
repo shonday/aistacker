@@ -5,6 +5,7 @@
 // When the generator adds a new tool, it appends one line here automatically.
 // Path convention: components/tools/{ComponentName}.tsx
 
+import ImageCompressor from "@/components/tools/ImageCompressor"
 import dynamic from "next/dynamic"
 
 export const toolRegistry: Record<string, React.ComponentType> = {
@@ -29,7 +30,8 @@ export const toolRegistry: Record<string, React.ComponentType> = {
   DiffChecker:          dynamic(() => import("@/components/tools/DiffChecker")),
   YamlFormatter:        dynamic(() => import("@/components/tools/YamlFormatter")),
   CsvJsonConverter:     dynamic(() => import("@/components/tools/CsvJsonConverter")),
-
+  ImageCompressor:      dynamic(() => import("@/components/tools/ImageCompressor")),
+  ImageCompressorAll:   dynamic(() => import("@/components/tools/ImageCompressorAll")),
 
 
 

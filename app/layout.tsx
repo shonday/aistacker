@@ -38,25 +38,45 @@ export const metadata: Metadata = {
 const initScript = `
 (function() {
   try {
-    // --- 主题控制逻辑 ---
-    var stored = localStorage.getItem('aistacker-theme');
-    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    var isDark = stored === 'dark' || (!stored && prefersDark) || (stored === 'system' && prefersDark);
-    if (isDark) document.documentElement.classList.add('dark');
+    // --- 1. Theme Logic (Keep as is) ---
+    var storedTheme = localStorage.getItem('aistacker-theme');
+    if (storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
 
-    // --- 极速重定向逻辑 (针对 0 Middleware 方案优化) ---
-    // 只在根路径执行，避免干扰其他页面
+    // --- 2. Smart Language Logic ---
     if (window.location.pathname === '/') {
-      var lang = navigator.language.toLowerCase();
-      if (lang.startsWith('zh')) {
-        window.location.replace('/zh');
-      } else if (lang.startsWith('ja')) {
-        window.location.replace('/ja');
+      // Helper to get cookie
+      var getCookie = function(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length === 2) return parts.pop().split(";").shift();
+      };
+
+      var userLang = getCookie('aistacker-locale'); // Cookie set by Switcher
+      var browserLang = navigator.language.toLowerCase();
+      var targetPath = '';
+
+      // Priority 1: User explicitly chose a language (Cookie exists)
+      if (userLang) {
+        if (userLang === 'zh') targetPath = '/zh';
+        else if (userLang === 'ja') targetPath = '/ja';
+      } 
+      // Priority 2: First time guess (No cookie yet)
+      else {
+        if (browserLang.startsWith('zh')) targetPath = '/zh';
+        else if (browserLang.startsWith('ja')) targetPath = '/ja';
+      }
+
+      // Final Check: Only redirect if target is different from current path
+      if (targetPath && window.location.pathname !== targetPath) {
+        window.location.replace(targetPath);
       }
     }
   } catch (e) {}
 })();
-`.trim()
+`.trim();
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
